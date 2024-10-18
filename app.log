@@ -1,0 +1,248 @@
+2024-10-18 23:51:40,538 - DEBUG - Query all movies and size is 31424
+2024-10-18 23:51:40,539 - DEBUG - The first movie <Movie 十分钟年华老去：大提琴篇 Ten Minutes Older: The Cello>
+2024-10-18 23:51:40,655 - DEBUG - get movie picture
+2024-10-18 23:51:40,655 - DEBUG - get movie picture
+2024-10-18 23:51:40,656 - DEBUG - get movie picture
+2024-10-18 23:51:40,657 - DEBUG - get movie picture
+2024-10-18 23:51:40,664 - DEBUG - get movie picture
+2024-10-18 23:51:40,670 - DEBUG - get movie picture
+2024-10-18 23:51:41,234 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p649728270.webp
+2024-10-18 23:51:41,234 - DEBUG - Image request status: 200
+2024-10-18 23:51:41,237 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910832390.webp
+2024-10-18 23:51:41,237 - DEBUG - Image request status: 404
+2024-10-18 23:51:41,244 - DEBUG - get movie picture
+2024-10-18 23:51:41,258 - DEBUG - get movie picture
+2024-10-18 23:51:41,267 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910832560.webp
+2024-10-18 23:51:41,267 - DEBUG - Image request status: 200
+2024-10-18 23:51:41,278 - DEBUG - get movie picture
+2024-10-18 23:51:41,651 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2513247938.webp
+2024-10-18 23:51:41,651 - DEBUG - Image request status: 200
+2024-10-18 23:51:41,658 - DEBUG - get movie picture
+2024-10-18 23:51:42,139 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1198885693.webp
+2024-10-18 23:51:42,139 - DEBUG - Image request status: 200
+2024-10-18 23:51:42,145 - DEBUG - get movie picture
+2024-10-18 23:51:42,489 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1910832189.webp
+2024-10-18 23:51:42,490 - DEBUG - Image request status: 200
+2024-10-18 23:51:42,492 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1910831868.webp
+2024-10-18 23:51:42,493 - DEBUG - Image request status: 200
+2024-10-18 23:51:42,500 - DEBUG - get movie picture
+2024-10-18 23:51:42,501 - DEBUG - get movie picture
+2024-10-18 23:51:42,650 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1354436051.webp
+2024-10-18 23:51:42,650 - DEBUG - Image request status: 200
+2024-10-18 23:51:42,660 - DEBUG - get movie picture
+2024-10-18 23:51:42,732 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910833170.webp
+2024-10-18 23:51:42,732 - DEBUG - Image request status: 200
+2024-10-18 23:51:42,742 - DEBUG - get movie picture
+2024-10-18 23:51:43,066 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1910895719.webp
+2024-10-18 23:51:43,067 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,076 - DEBUG - get movie picture
+2024-10-18 23:51:43,093 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1446261379.webp
+2024-10-18 23:51:43,094 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,102 - DEBUG - get movie picture
+2024-10-18 23:51:43,143 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p454040918.webp
+2024-10-18 23:51:43,144 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,150 - DEBUG - get movie picture
+2024-10-18 23:51:43,202 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910896706.webp
+2024-10-18 23:51:43,202 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,208 - DEBUG - get movie picture
+2024-10-18 23:51:43,432 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1158743783.webp
+2024-10-18 23:51:43,433 - DEBUG - Image request status: 404
+2024-10-18 23:51:43,447 - DEBUG - get movie picture
+2024-10-18 23:51:43,545 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1283688673.webp
+2024-10-18 23:51:43,545 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,623 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p820453760.webp
+2024-10-18 23:51:43,623 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,667 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910896984.webp
+2024-10-18 23:51:43,668 - DEBUG - Image request status: 200
+2024-10-18 23:51:43,674 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p909265336.webp
+2024-10-18 23:51:43,674 - DEBUG - Image request status: 200
+2024-10-18 23:51:45,249 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2327817788.webp
+2024-10-18 23:51:45,249 - DEBUG - Image request status: 200
+2024-10-18 23:51:46,141 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2167017148.webp
+2024-10-18 23:51:46,141 - DEBUG - Image request status: 200
+2024-10-18 23:52:00,150 - DEBUG - Query all movies and size is 31424
+2024-10-18 23:52:00,150 - DEBUG - The first movie <Movie 功夫>
+2024-10-18 23:52:00,272 - DEBUG - get movie picture
+2024-10-18 23:52:00,275 - DEBUG - get movie picture
+2024-10-18 23:52:00,400 - DEBUG - get movie picture
+2024-10-18 23:52:00,402 - DEBUG - get movie picture
+2024-10-18 23:52:00,403 - DEBUG - get movie picture
+2024-10-18 23:52:00,452 - DEBUG - get movie picture
+2024-10-18 23:52:00,904 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p692813374.webp
+2024-10-18 23:52:00,905 - DEBUG - Image request status: 200
+2024-10-18 23:52:00,911 - DEBUG - get movie picture
+2024-10-18 23:52:00,955 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825503.webp
+2024-10-18 23:52:00,955 - DEBUG - Image request status: 200
+2024-10-18 23:52:00,959 - DEBUG - get movie picture
+2024-10-18 23:52:01,211 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p581792602.webp
+2024-10-18 23:52:01,211 - DEBUG - Image request status: 200
+2024-10-18 23:52:01,215 - DEBUG - get movie picture
+2024-10-18 23:52:01,252 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910813120.webp
+2024-10-18 23:52:01,253 - DEBUG - Image request status: 404
+2024-10-18 23:52:01,262 - DEBUG - get movie picture
+2024-10-18 23:52:01,272 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910824340.webp
+2024-10-18 23:52:01,272 - DEBUG - Image request status: 404
+2024-10-18 23:52:01,275 - DEBUG - get movie picture
+2024-10-18 23:52:01,397 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1910812549.webp
+2024-10-18 23:52:01,397 - DEBUG - Image request status: 404
+2024-10-18 23:52:01,401 - DEBUG - get movie picture
+2024-10-18 23:52:01,491 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825990.webp
+2024-10-18 23:52:01,491 - DEBUG - Image request status: 200
+2024-10-18 23:52:01,495 - DEBUG - get movie picture
+2024-10-18 23:52:01,685 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825832.webp
+2024-10-18 23:52:01,685 - DEBUG - Image request status: 404
+2024-10-18 23:52:01,689 - DEBUG - get movie picture
+2024-10-18 23:52:01,821 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1606727862.webp
+2024-10-18 23:52:01,821 - DEBUG - Image request status: 200
+2024-10-18 23:52:01,826 - DEBUG - get movie picture
+2024-10-18 23:52:01,877 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2455329155.webp
+2024-10-18 23:52:01,877 - DEBUG - Image request status: 404
+2024-10-18 23:52:01,880 - DEBUG - get movie picture
+2024-10-18 23:52:01,934 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910826560.webp
+2024-10-18 23:52:01,934 - DEBUG - Image request status: 200
+2024-10-18 23:52:01,937 - DEBUG - get movie picture
+2024-10-18 23:52:01,966 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2191934463.webp
+2024-10-18 23:52:01,967 - DEBUG - Image request status: 200
+2024-10-18 23:52:01,971 - DEBUG - get movie picture
+2024-10-18 23:52:01,996 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910824951.webp
+2024-10-18 23:52:01,997 - DEBUG - Image request status: 200
+2024-10-18 23:52:02,001 - DEBUG - get movie picture
+2024-10-18 23:52:02,044 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2540924496.webp
+2024-10-18 23:52:02,044 - DEBUG - Image request status: 200
+2024-10-18 23:52:02,048 - DEBUG - get movie picture
+2024-10-18 23:52:02,369 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910831341.webp
+2024-10-18 23:52:02,369 - DEBUG - Image request status: 200
+2024-10-18 23:52:02,474 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p642799654.webp
+2024-10-18 23:52:02,475 - DEBUG - Image request status: 200
+2024-10-18 23:52:02,619 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910828286.webp
+2024-10-18 23:52:02,620 - DEBUG - Image request status: 200
+2024-10-18 23:52:02,688 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p459511864.webp
+2024-10-18 23:52:02,688 - DEBUG - Image request status: 200
+2024-10-18 23:52:02,783 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2507020671.webp
+2024-10-18 23:52:02,783 - DEBUG - Image request status: 404
+2024-10-18 23:52:03,012 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp
+2024-10-18 23:52:03,013 - DEBUG - Image request status: 200
+2024-10-18 23:52:05,523 - DEBUG - Query all movies and size is 31424
+2024-10-18 23:52:05,524 - DEBUG - The first movie <Movie 功夫>
+2024-10-18 23:52:05,611 - DEBUG - get movie picture
+2024-10-18 23:52:05,616 - DEBUG - get movie picture
+2024-10-18 23:52:05,697 - DEBUG - get movie picture
+2024-10-18 23:52:05,698 - DEBUG - get movie picture
+2024-10-18 23:52:05,698 - DEBUG - get movie picture
+2024-10-18 23:52:05,705 - DEBUG - get movie picture
+2024-10-18 23:52:05,947 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910826560.webp
+2024-10-18 23:52:05,948 - DEBUG - Image request status: 200
+2024-10-18 23:52:05,951 - DEBUG - get movie picture
+2024-10-18 23:52:06,220 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p692813374.webp
+2024-10-18 23:52:06,220 - DEBUG - Image request status: 200
+2024-10-18 23:52:06,224 - DEBUG - get movie picture
+2024-10-18 23:52:06,530 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910824340.webp
+2024-10-18 23:52:06,530 - DEBUG - Image request status: 404
+2024-10-18 23:52:06,534 - DEBUG - get movie picture
+2024-10-18 23:52:06,555 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910813120.webp
+2024-10-18 23:52:06,555 - DEBUG - Image request status: 404
+2024-10-18 23:52:06,558 - DEBUG - get movie picture
+2024-10-18 23:52:06,948 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1910812549.webp
+2024-10-18 23:52:06,948 - DEBUG - Image request status: 404
+2024-10-18 23:52:06,951 - DEBUG - get movie picture
+2024-10-18 23:52:06,987 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910831341.webp
+2024-10-18 23:52:06,987 - DEBUG - Image request status: 200
+2024-10-18 23:52:06,993 - DEBUG - get movie picture
+2024-10-18 23:52:07,014 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2455329155.webp
+2024-10-18 23:52:07,015 - DEBUG - Image request status: 404
+2024-10-18 23:52:07,018 - DEBUG - get movie picture
+2024-10-18 23:52:07,037 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2507020671.webp
+2024-10-18 23:52:07,037 - DEBUG - Image request status: 404
+2024-10-18 23:52:07,041 - DEBUG - get movie picture
+2024-10-18 23:52:07,042 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p642799654.webp
+2024-10-18 23:52:07,042 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,046 - DEBUG - get movie picture
+2024-10-18 23:52:07,239 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825990.webp
+2024-10-18 23:52:07,240 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,246 - DEBUG - get movie picture
+2024-10-18 23:52:07,426 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p581792602.webp
+2024-10-18 23:52:07,427 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,431 - DEBUG - get movie picture
+2024-10-18 23:52:07,469 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1606727862.webp
+2024-10-18 23:52:07,469 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,473 - DEBUG - get movie picture
+2024-10-18 23:52:07,605 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910828286.webp
+2024-10-18 23:52:07,606 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,611 - DEBUG - get movie picture
+2024-10-18 23:52:07,643 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2540924496.webp
+2024-10-18 23:52:07,643 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,646 - DEBUG - get movie picture
+2024-10-18 23:52:07,836 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910824951.webp
+2024-10-18 23:52:07,837 - DEBUG - Image request status: 200
+2024-10-18 23:52:07,949 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p459511864.webp
+2024-10-18 23:52:07,949 - DEBUG - Image request status: 200
+2024-10-18 23:52:08,096 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825503.webp
+2024-10-18 23:52:08,096 - DEBUG - Image request status: 200
+2024-10-18 23:52:08,131 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2191934463.webp
+2024-10-18 23:52:08,132 - DEBUG - Image request status: 200
+2024-10-18 23:52:08,137 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825832.webp
+2024-10-18 23:52:08,137 - DEBUG - Image request status: 404
+2024-10-18 23:52:08,386 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp
+2024-10-18 23:52:08,386 - DEBUG - Image request status: 200
+2024-10-18 23:52:30,170 - DEBUG - Query all movies and size is 31424
+2024-10-18 23:52:30,170 - DEBUG - The first movie <Movie 功夫>
+2024-10-18 23:52:30,268 - DEBUG - get movie picture
+2024-10-18 23:52:30,270 - DEBUG - get movie picture
+2024-10-18 23:52:30,342 - DEBUG - get movie picture
+2024-10-18 23:52:30,343 - DEBUG - get movie picture
+2024-10-18 23:52:30,344 - DEBUG - get movie picture
+2024-10-18 23:52:30,356 - DEBUG - get movie picture
+2024-10-18 23:52:30,871 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2191934463.webp
+2024-10-18 23:52:30,872 - DEBUG - Image request status: 200
+2024-10-18 23:52:30,875 - DEBUG - get movie picture
+2024-10-18 23:52:30,941 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p692813374.webp
+2024-10-18 23:52:30,941 - DEBUG - Image request status: 200
+2024-10-18 23:52:30,947 - DEBUG - get movie picture
+2024-10-18 23:52:31,169 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910813120.webp
+2024-10-18 23:52:31,170 - DEBUG - Image request status: 404
+2024-10-18 23:52:31,173 - DEBUG - get movie picture
+2024-10-18 23:52:31,199 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910824340.webp
+2024-10-18 23:52:31,199 - DEBUG - Image request status: 404
+2024-10-18 23:52:31,203 - DEBUG - get movie picture
+2024-10-18 23:52:31,353 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p1910812549.webp
+2024-10-18 23:52:31,354 - DEBUG - Image request status: 404
+2024-10-18 23:52:31,358 - DEBUG - get movie picture
+2024-10-18 23:52:31,362 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825503.webp
+2024-10-18 23:52:31,362 - DEBUG - Image request status: 200
+2024-10-18 23:52:31,366 - DEBUG - get movie picture
+2024-10-18 23:52:31,395 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910826560.webp
+2024-10-18 23:52:31,395 - DEBUG - Image request status: 200
+2024-10-18 23:52:31,399 - DEBUG - get movie picture
+2024-10-18 23:52:31,476 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910831341.webp
+2024-10-18 23:52:31,476 - DEBUG - Image request status: 200
+2024-10-18 23:52:31,480 - DEBUG - get movie picture
+2024-10-18 23:52:31,603 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2540924496.webp
+2024-10-18 23:52:31,603 - DEBUG - Image request status: 200
+2024-10-18 23:52:31,607 - DEBUG - get movie picture
+2024-10-18 23:52:31,635 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p642799654.webp
+2024-10-18 23:52:31,635 - DEBUG - Image request status: 200
+2024-10-18 23:52:31,640 - DEBUG - get movie picture
+2024-10-18 23:52:31,718 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825990.webp
+2024-10-18 23:52:31,718 - DEBUG - Image request status: 200
+2024-10-18 23:52:31,722 - DEBUG - get movie picture
+2024-10-18 23:52:31,909 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910825832.webp
+2024-10-18 23:52:31,910 - DEBUG - Image request status: 404
+2024-10-18 23:52:31,913 - DEBUG - get movie picture
+2024-10-18 23:52:31,960 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2455329155.webp
+2024-10-18 23:52:31,960 - DEBUG - Image request status: 404
+2024-10-18 23:52:31,964 - DEBUG - get movie picture
+2024-10-18 23:52:32,016 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p581792602.webp
+2024-10-18 23:52:32,017 - DEBUG - Image request status: 200
+2024-10-18 23:52:32,020 - DEBUG - get movie picture
+2024-10-18 23:52:32,121 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1606727862.webp
+2024-10-18 23:52:32,122 - DEBUG - Image request status: 200
+2024-10-18 23:52:32,374 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910824951.webp
+2024-10-18 23:52:32,374 - DEBUG - Image request status: 200
+2024-10-18 23:52:32,436 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p1910828286.webp
+2024-10-18 23:52:32,436 - DEBUG - Image request status: 200
+2024-10-18 23:52:32,555 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p459511864.webp
+2024-10-18 23:52:32,556 - DEBUG - Image request status: 200
+2024-10-18 23:52:32,946 - DEBUG - Decoded image URL: https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp
+2024-10-18 23:52:32,946 - DEBUG - Image request status: 200
+2024-10-18 23:52:33,218 - DEBUG - Decoded image URL: https://img3.doubanio.com/view/photo/s_ratio_poster/public/p2507020671.webp
+2024-10-18 23:52:33,219 - DEBUG - Image request status: 404
