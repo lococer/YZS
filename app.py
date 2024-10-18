@@ -68,39 +68,64 @@ def greet(username):
     # return 'Hello'
     return f'Hello {username}'
 
+def encode_image_url(image_url):
+    """将数据库中的封面url转换成Base64编码"""
+    if image_url:
+        return base64.urlsafe_b64encode(image_url.encode('utf-8')).decode('utf-8')
+    return ''
+
+def paginate_items(items, page, items_per_page=20):
+    """分页函数"""
+    total_items = len(items)
+    total_pages = (total_items + items_per_page - 1) // items_per_page
+    
+    start = (page - 1) * items_per_page
+    end = start + items_per_page
+    paginated_items = items[start:end]
+    
+    return paginated_items, total_pages
+
 @app.route('/movies')
 def movies():
-    # 自定义函数
-    def get_encode_url(image_url):
-        """ 将数据库中的封面url转换成Base64编码 """
-        encoded_url = base64.urlsafe_b64encode(image_url.encode('utf-8')).decode('utf-8')
-        return encoded_url
-
     # 获取所有电影
     all_movies = Movie.query.all()
     
-    # 设置每页电影数量
-    movies_per_page = 20
     # 获取当前页数，默认为1
     page = request.args.get('page', 1, type=int)
     
-    # 计算总页数
-    total_movies = len(all_movies)
-    total_pages = (total_movies + movies_per_page - 1) // movies_per_page
-
-    # 计算当前页的电影
-    start = (page - 1) * movies_per_page
-    end = start + movies_per_page
-    movies = all_movies[start:end]
-
-    # 日志
-    logger.debug("Query all movies and size is " + str(total_movies))
-    logger.debug("The first movie " + str(movies[0]) if movies else "No movies found")
-
+    # 使用分页函数
+    movies, total_pages = paginate_items(all_movies, page)
+    
+    # 为每个电影封面编码URL
     for movie in movies:
-        movie.img = get_encode_url(movie.img)
+        movie.img = encode_image_url(movie.img)
+    
+    # 日志
+    logger.debug(f"Query all movies, total: {len(all_movies)}, page: {page}")
+    logger.debug(f"First movie: {movies[0].name if movies else 'No movies found'}")
 
     return render_template("movies.html", movies=movies, total_pages=total_pages, current_page=page)
+
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    
+    # 使用模糊查询搜索电影
+    search_pattern = f"%{query}%"
+    search_results = Movie.query.filter(Movie.name.ilike(search_pattern)).all()
+
+    # 获取当前页数
+    page = request.args.get('page', 1, type=int)
+
+    # 使用分页函数
+    movies, total_pages = paginate_items(search_results, page)
+
+    # 为每个电影封面编码URL
+    for movie in movies:
+        movie.img = encode_image_url(movie.img)
+
+    return render_template('movies.html', movies=movies, total_pages=total_pages, current_page=page, query=query)
+
 
 @app.route('/index')
 def index():
@@ -141,8 +166,8 @@ if __name__ == '__main__':
 
 
 """
-电影模块：列出所有 查询电影 查看电影详情
+电影模块：列出所有查询电影 查看电影详情
 演员关系图
-电影评分预测
+电影评分预测 
 
 """

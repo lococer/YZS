@@ -73,6 +73,16 @@
         </div>
     </header><!-- End Header -->
 
+    <div>
+        <h1>Search Movies</h1>
+
+        <!-- Search form -->
+        <form id="searchForm" action="/search" method="get">
+            <input type="text" id="searchQuery" name="q" placeholder="Search for a movie..." required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
     <div class="movie-container">
         {% for movie in movies %}
         <div class="movie">

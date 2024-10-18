@@ -3,75 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Movie List</title>
-    <style>
-        /* 容器样式 */
-        .movie-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 设置自适应列 */
-            gap: 20px; /* 每个电影之间的间距 */
-            padding: 20px; /* 容器内边距 */
-        }
-
-        /* 每个电影卡片的样式 */
-        .movie {
-            text-align: center; /* 电影名称居中 */
-        }
-
-        /* 图片样式 */
-        .movie img {
-            width: 100%; /* 图片宽度100% */
-            height: auto; /* 高度自适应 */
-            border-radius: 10px; /* 图片圆角 */
-            object-fit: cover; /* 图片填充 */
-        }
-
-        /* 电影标题样式 */
-        .movie-title {
-            margin-top: 10px; /* 标题上边距 */
-            font-size: 18px; /* 字体大小 */
-            color: #333; /* 字体颜色 */
-        }
-    </style>
+    <title>Movie Search</title>
 </head>
 <body>
+    <h1>Search Movies</h1>
+    
+    <!-- Search form -->
+    <form id="searchForm" action="/search" method="get">
+        <input type="text" id="searchQuery" name="q" placeholder="Search for a movie..." required>
+        <button type="submit">Search</button>
+    </form>
 
-    <div class="movie-container">
-        <!-- Movie 1 -->
-        <div class="movie">
-            <img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp" alt="Movie 1">
-            <div class="movie-title">Movie Title 1</div>
-        </div>
-
-        <!-- Movie 2 -->
-        <div class="movie">
-            <img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp" alt="Movie 2">
-            <div class="movie-title">Movie Title 2</div>
-        </div>
-
-        <!-- Movie 3 -->
-        <div class="movie">
-            <img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp" alt="Movie 3">
-            <div class="movie-title">Movie Title 3</div>
-        </div>
-
-        <!-- 添加更多电影 -->
-        <div class="movie">
-            <img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp" alt="Movie 4">
-            <div class="movie-title">Movie Title 4</div>
-        </div>
-
-        <div class="movie">
-            <img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp" alt="Movie 5">
-            <div class="movie-title">Movie Title 5</div>
-        </div>
-
-        <div class="movie">
-            <img src="https://img1.doubanio.com/view/photo/s_ratio_poster/public/p2219011938.webp" alt="Movie 6">
-            <div class="movie-title">Movie Title 6</div>
-        </div>
+    <!-- Movie results section -->
+    <div id="results">
+        {% if movies %}
+            <h2>Search Results:</h2>
+            <ul>
+                {% for movie in movies %}
+                    <li>{{ movie.name }} ({{ movie.year }}) - Rating: {{ movie.rating }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No movies found.</p>
+        {% endif %}
     </div>
-
 </body>
 </html>
+
 
