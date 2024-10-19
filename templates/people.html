@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Home</title>
-    <meta content="" name="descriptison">
+    <title>People</title>
+    <meta content="" name="description">
     <meta content="" name="keywords">
 
     <!-- Favicons -->
@@ -14,9 +14,7 @@
     <link href="../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -35,32 +33,21 @@
     <!-- ======= Header ======= -->
     <header id="header">
         <div class="container">
-
             <div class="logo float-left">
                 <h1 class="text-light"><a href="index.html"><span>影智算</span></a></h1>
-                <!-- Uncomment below if you prefer to use an image logo -->
-                <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
             </div>
-
             <nav class="nav-menu float-right d-none d-lg-block">
                 <ul>
-                    <li><a href="/index">Home <i class="la la-angle-down"></i></a></li>
-                    <li class="active"><a href="/movies">电影</a></li>
-                    <li><a href="/people">影人</a></li>
+                    <li><a href="/index">主页</a></li>
+                    <li><a href="/movies">电影</a></li>
+                    <li class="active"><a href="/people">影人</a></li>
+                    <li><a href="#services">Services</a></li>
                     <li><a href="#portfolio">Portfolio</a></li>
                     <li><a href="#team">Team</a></li>
                     <li class="drop-down"><a href="">Drop Down</a>
                         <ul>
                             <li><a href="#">Drop Down 1</a></li>
-                            <li class="drop-down"><a href="#">Drop Down 2</a>
-                                <ul>
-                                    <li><a href="#">Deep Drop Down 1</a></li>
-                                    <li><a href="#">Deep Drop Down 2</a></li>
-                                    <li><a href="#">Deep Drop Down 3</a></li>
-                                    <li><a href="#">Deep Drop Down 4</a></li>
-                                    <li><a href="#">Deep Drop Down 5</a></li>
-                                </ul>
-                            </li>
+                            <li><a href="#">Drop Down 2</a></li>
                             <li><a href="#">Drop Down 3</a></li>
                             <li><a href="#">Drop Down 4</a></li>
                             <li><a href="#">Drop Down 5</a></li>
@@ -69,68 +56,64 @@
                     <li><a href="#contact">Contact Us</a></li>
                 </ul>
             </nav><!-- .nav-menu -->
-
         </div>
     </header><!-- End Header -->
 
     <div>
-        <h1>Search Movies</h1>
-
+        <h1>Search People</h1>
         <!-- Search form -->
-        <form id="searchForm" action="/movies/search" method="get">
-            <input type="text" id="searchQuery" name="q" placeholder="Search for a movie..." required>
+        <form id="searchForm" action="/people/search" method="get">
+            <input type="text" id="searchQuery" name="q" placeholder="Search for a person..." required>
             <button type="submit">Search</button>
         </form>
     </div>
 
     <div class="movie-container">
-        {% for movie in movies %}
+        {% for person in people %}
         <div class="movie">
-            <a href="/movies/{{ movie.id }}">
-                <img src="/proxy-image/{{ movie.img }}" alt="{{ movie.name }}">
+            <a href="/people/{{ person.id }}">
+                <img src="/proxy-image/{{ person.img }}" alt="{{ person.name }}">
             </a>
-            <div class="movie-title">{{ movie.name }}</div>
+            <div class="movie-title">{{ person.name }}</div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- 分页控件 -->
+    <!-- Pagination -->
     <div class="pagination">
-        <!-- 上一页链接 -->
         {% if current_page > 1 %}
-        <a href="{{ url_for('movies', page=current_page - 1) }}" aria-label="Previous page">« Prev</a>
+        <a href="{{ url_for('people', page=current_page - 1) }}" aria-label="Previous page">« Prev</a>
         {% endif %}
-
-        <!-- 第一页链接 -->
+        
         {% if current_page > 3 %}
-        <a href="{{ url_for('movies', page=1) }}" aria-label="First page">1</a>
+        <a href="{{ url_for('people', page=1) }}" aria-label="First page">1</a>
         {% if current_page > 4 %}
         <span aria-hidden="true">...</span>
         {% endif %}
         {% endif %}
-
-        <!-- 当前页前后的页码 -->
+        
         {% for page_num in range(max(1, current_page - 3), min(current_page + 4, total_pages)) %}
         {% if page_num == current_page %}
         <span aria-current="page">{{ page_num }}</span>
         {% else %}
-        <a href="{{ url_for('movies', page=page_num) }}" aria-label="Page {{ page_num }}">{{ page_num }}</a>
+        <a href="{{ url_for('people', page=page_num) }}" aria-label="Page {{ page_num }}">{{ page_num }}</a>
         {% endif %}
         {% endfor %}
-
-        <!-- 最后一页链接 -->
-        {% if current_page < total_pages - 2 %} {% if current_page < total_pages - 3 %} <span aria-hidden="true">
-            ...</span>
-            {% endif %}
-            <a href="{{ url_for('movies', page=total_pages) }}" aria-label="Last page">{{ total_pages }}</a>
-            {% endif %}
-
-            <!-- 下一页链接 -->
-            {% if current_page < total_pages %} <a href="{{ url_for('movies', page=current_page + 1) }}"
-                aria-label="Next page">Next »</a>
-                {% endif %}
+        
+        {% if current_page < total_pages - 2 %}
+        {% if current_page < total_pages - 3 %}
+        <span aria-hidden="true">...</span>
+        {% endif %}
+        <a href="{{ url_for('people', page=total_pages) }}" aria-label="Last page">{{ total_pages }}</a>
+        {% endif %}
+        
+        {% if current_page < total_pages %}
+        <a href="{{ url_for('people', page=current_page + 1) }}" aria-label="Next page">Next »</a>
+        {% endif %}
     </div>
 
+    <footer id="footer">
+        <!-- Footer content -->
     </footer><!-- End Footer -->
 
     <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
@@ -139,7 +122,7 @@
     <script src="../static/assets/vendor/jquery/jquery.min.js"></script>
     <script src="../static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
+    <script src="../static/assets/vendor/php-email-form/validate.js"></script>
     <script src="../static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
     <script src="../static/assets/vendor/venobox/venobox.min.js"></script>
     <script src="../static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>

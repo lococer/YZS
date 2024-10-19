@@ -5,6 +5,9 @@ import base64
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from jinja2 import Template
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
 
 # 配置文件日志处理器
 file_handler = logging.FileHandler('app.log')  # 指定日志文件
@@ -30,6 +33,11 @@ app.jinja_env.globals.update({
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:leo@localhost:5432/postgres'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# 创建连接引擎和会话
+engine = create_engine('postgresql://postgres:leo@localhost:5432/postgres')
+Session = sessionmaker(bind=engine)
+session = Session()
+
 # 创建数据库实例
 db = SQLAlchemy(app)
 
@@ -50,6 +58,25 @@ class Movie(db.Model):
 
     def __repr__(self):
         return f'<Movie {self.name}>'
+    
+class Person(db.Model):
+    __tablename__ = 'person'
+
+    id = db.Column(db.Integer, primary_key=True) 
+    name = db.Column(db.String(100))
+    img = db.Column(db.String(100))
+    sex = db.Column(db.String(100))
+    birthday = db.Column(db.String(100))
+    birthplace = db.Column(db.String(100))
+    summary = db.Column(db.String(100))
+
+class Relationships(db.Model):
+    __tablename__ = 'relationships'
+
+    movie_id = db.Column(db.Integer)
+    person_id = db.Column(db.Integer,primary_key=True)
+    role = db.Column(db.String(100))
+
 
 # 创建数据库表
 with app.app_context():
@@ -106,9 +133,11 @@ def movies():
 
     return render_template("movies.html", movies=movies, total_pages=total_pages, current_page=page)
 
-@app.route('/search')
-def search():
+@app.route('/movies/search')
+def search_movies():
     query = request.args.get('q', '')
+
+    logger.debug(f"查询{query}电影")
     
     # 使用模糊查询搜索电影
     search_pattern = f"%{query}%"
@@ -126,6 +155,69 @@ def search():
 
     return render_template('movies.html', movies=movies, total_pages=total_pages, current_page=page, query=query)
 
+# 查询特定电影的所有演员
+def get_actors_by_movie_id(movie_id):
+    query = (
+        db.session.query(Person)
+        .select_from(Relationships)
+        .join(Person, Relationships.person_id == Person.id)
+        .filter(Relationships.movie_id == movie_id)
+    )
+    return query.all()
+
+@app.route('/movies/<int:movie_id>')
+def movieinfo(movie_id):
+    movie = Movie.query.get(movie_id)
+    if not movie:
+        return abort(404)  # 如果没有找到电影，返回404错误
+    actors = get_actors_by_movie_id(movie_id)
+
+    for actor in actors:
+        logger.debug(f"Actor ID: {actor.id}, Name: {actor.name}")
+
+    return render_template('movieinfo.html', movie=movie, actors=actors)
+
+@app.route('/people')
+def people():
+    # 获取所有人员信息
+    all_people = Person.query.all()
+    
+    # 获取当前页数，默认为1
+    page = request.args.get('page', 1, type=int)
+    
+    # 使用分页函数
+    people, total_pages = paginate_items(all_people, page)
+    
+    # 日志
+    logger.debug(f"Query all people, total: {len(all_people)}, page: {page}")
+    logger.debug(f"First person: {people[0].name if people else 'No people found'}")
+
+    for person in people:
+        person.img = encode_image_url(person.img)
+
+    return render_template("people.html", people=people, total_pages=total_pages, current_page=page)
+
+@app.route('/people/search')
+def search_people():
+    query = request.args.get('q', '')
+
+    logger.debug(f"查询{query}影人")
+    
+    # 使用模糊查询搜索电影
+    search_pattern = f"%{query}%"
+    search_results = Person.query.filter(Person.name.ilike(search_pattern)).all()
+
+    # 获取当前页数
+    page = request.args.get('page', 1, type=int)
+
+    # 使用分页函数
+    people, total_pages = paginate_items(search_results, page)
+
+    # 为每个电影封面编码URL
+    for person in people:
+        person.img = encode_image_url(person.img)
+
+    return render_template('people.html', people=people, total_pages=total_pages, current_page=page, query=query)
 
 @app.route('/index')
 def index():
@@ -134,40 +226,35 @@ def index():
 # 代理图片的路由，接收 Base64 编码的 URL
 @app.route('/proxy-image/<path:encoded_url>')
 def proxy_image(encoded_url):
-    logger.debug("get movie picture") 
-    # logger.debug(encoded_url)
-    # logger.debug(base64.urlsafe_b64decode(encoded_url).decode('utf-8'))
+    logger.debug("get picture") 
+    logger.debug(encoded_url)
+    logger.debug(base64.urlsafe_b64decode(encoded_url).decode('utf-8'))
     # print("get movie picture", encoded_url, base64.urlsafe_b64decode(encoded_url).decode('utf-8'))
     try:
+        logger.debug("OK0")
         # Base64 解码 URL
         image_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
         
+        logger.debug("OK1")
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
         # 请求图片数据
         response = requests.get(image_url, headers=headers)
 
+        logger.debug("OK2")
         logger.debug(f"Decoded image URL: {image_url}")
         logger.debug(f"Image request status: {response.status_code}")
         
+        logger.debug("OK3")
         if response.status_code == 200:
             img = BytesIO(response.content)
             return send_file(img, mimetype='image/webp')
         else:
             return abort(404)  # 如果图片获取失败，则返回 404 错误
     except Exception as e:
+        logger.debug("picture failed" + e)
         return abort(400)  # 如果解码出错，返回 400 错误
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000,debug=True)
-
-
-
-
-"""
-电影模块：列出所有查询电影 查看电影详情
-演员关系图
-电影评分预测 
-
-"""

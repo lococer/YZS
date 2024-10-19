@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ movie.name }} Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .movie-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .movie-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #e0245e;
+        }
+        .movie-header span {
+            display: block;
+            font-size: 1.2em;
+            color: #555;
+        }
+        .movie-poster {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .movie-details {
+            margin-bottom: 20px;
+        }
+        .movie-details p {
+            margin: 0;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .movie-details strong {
+            color: #e0245e;
+        }
+        .actors-list {
+            margin-top: 20px;
+        }
+        .actors-list h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .actor {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .actor:last-child {
+            border-bottom: none;
+        }
+        .actor img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .actor-name {
+            font-size: 1.1em;
+            margin: 0;
+            color: #333;
+        }
+        .actor-role {
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="movie-header">
+            <img src="{{ 'proxy-image/' + movie.img }}" alt="Movie Poster" class="movie-poster">
+            <h1>{{ movie.name }} ({{ movie.year }})</h1>
+        </div>
+        <div class="movie-details">
+            <p><strong>Rating:</strong> {{ movie.rating }}</p>
+            <p><strong>Rating Sum:</strong> {{ movie.ratingsum }}</p>
+            <p><strong>Tags:</strong> {% for tag in movie.tags %} {{ tag }} {% if not loop.last %}, {% endif %} {% endfor %}</p>
+            <p><strong>Summary:</strong> {{ movie.summary }}</p>
+            <p><strong>Genre:</strong> {{ movie.genre }}</p>
+            <p><strong>Country:</strong> {{ movie.country }}</p>
+        </div>
+        <div class="actors-list">
+            <h2>Actors</h2>
+            {% for actor in actors %}
+            <div class="actor">
+                <img src="{{ 'proxy-image/' + actor.img }}" alt="Actor Profile Picture">
+                <div>
+                    <p class="actor-name">{{ actor.name }}</p>
+                    <p class="actor-role">{{ actor.role }}</p>
+                </div>
+            </div>
+            {% else %}
+            <p>No actors found for this movie.</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
