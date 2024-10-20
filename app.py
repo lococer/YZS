@@ -1,11 +1,12 @@
-from flask import Flask, abort, render_template, request, send_file
+from itertools import combinations
+from flask import Flask, abort, render_template, request, send_file, jsonify
 import requests
 from io import BytesIO
 import base64
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from jinja2 import Template
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -84,7 +85,7 @@ with app.app_context():
 
 @app.route('/test')
 def test():
-    return render_template("hello.html")
+    return render_template("people_relationship.html")
 
 @app.route('/')
 def root():
@@ -201,6 +202,94 @@ def people():
 
     return render_template("people.html", people=people, total_pages=total_pages, current_page=page)
 
+def find_coactors(person_id):
+    result = {}
+    try:
+        logger.debug("start query coactors")
+        
+        # 查询该演员参与过的所有电影，包括自己
+        actor_movies = db.session.query(Relationships.movie_id).filter_by(person_id=person_id).subquery()
+
+        # 查询这些电影的所有演员，并计算与指定演员的合作次数
+        coactors = (
+            db.session.query(
+                Person.id,
+                Person.name,
+                func.count(Relationships.movie_id).label('coactor_count')
+            )
+            .join(Relationships, Relationships.person_id == Person.id)
+            .filter(Relationships.movie_id.in_(actor_movies))
+            .group_by(Person.id, Person.name)
+            .order_by(func.count(Relationships.movie_id).desc())
+            .limit(15)  # 限制返回前10个合作演员
+            .all()
+        )
+
+        logger.debug(coactors)
+        
+        # 将共同演员的 ID 和名称加入结果
+        result["actors"] = [{"id": actor.id, "name": actor.name} for actor in coactors]
+        
+        # 获取共同演员之间的所有组合
+        actor_list = [(actor.id, actor.name) for actor in coactors]  # 获取演员 ID 和名称的列表
+        logger.debug(str(len(actor_list)))
+
+        # 查询所有共同电影 ID
+        coactor_pairs = [(actor1.id, actor2.id) for actor1, actor2 in combinations(coactors, 2)]
+        movie_relations = (
+            db.session.query(Relationships.movie_id, Relationships.person_id)
+            .filter(Relationships.person_id.in_([actor_id for actor_id, _ in coactor_pairs]))
+            .all()
+        )
+
+        # 将电影关系整理到字典中
+        movie_dict = {}
+        for movie_id, person_id in movie_relations:
+            if movie_id not in movie_dict:
+                movie_dict[movie_id] = set()
+            movie_dict[movie_id].add(person_id)
+
+        # 组装每对演员的共同电影
+        relationships = []
+        for actor1_id, actor2_id in coactor_pairs:
+            common_movie_ids = [
+                movie_id for movie_id, ids in movie_dict.items()
+                if actor1_id in ids and actor2_id in ids
+            ]
+
+            if common_movie_ids:
+                actor1_name = next(actor.name for actor in coactors if actor.id == actor1_id)
+                actor2_name = next(actor.name for actor in coactors if actor.id == actor2_id)
+                relationships.append({
+                    "source": actor1_name,
+                    "target": actor2_name,
+                    "common_movie_ids": common_movie_ids,
+                    "value": len(common_movie_ids)  # 可以选择更有意义的值
+                })
+
+        result["links"] = relationships
+        logger.debug("end query coactors")
+
+    except Exception as err:
+        logger.error("query coactors error: " + str(err))
+    
+    logger.debug(result)
+    return jsonify(result)
+
+@app.route('/require/people_relationship/<int:people_id>')
+def require_people_relationship(people_id):
+    """返回json,指定演员合作过的演员,以及合作过的次数
+    """
+    coactors = find_coactors(person_id=people_id)
+
+    return coactors
+
+@app.route('/people_relationship/<int:people_id>')
+def people_relationship(people_id):
+    logger.debug('enter people_relationship')
+    return render_template("people_relationship.html", people_id=people_id)
+
+
 @app.route('/people/search')
 def search_people():
     query = request.args.get('q', '')
@@ -284,4 +373,4 @@ def proxy_image(encoded_url):
         return abort(400)  # 如果解码出错，返回 400 错误
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=5000,debug=True)
+    app.run(host='0.0.0.0',port=5001,debug=True)
