@@ -156,7 +156,7 @@ def search_movies():
     return render_template('movies.html', movies=movies, total_pages=total_pages, current_page=page, query=query)
 
 # 查询特定电影的所有演员
-def get_actors_by_movie_id(movie_id):
+def get_people_by_movie_id(movie_id):
     query = (
         db.session.query(Person)
         .select_from(Relationships)
@@ -170,12 +170,16 @@ def movieinfo(movie_id):
     movie = Movie.query.get(movie_id)
     if not movie:
         return abort(404)  # 如果没有找到电影，返回404错误
-    actors = get_actors_by_movie_id(movie_id)
+    
+    movie.img = encode_image_url(movie.img)
 
-    for actor in actors:
-        logger.debug(f"Actor ID: {actor.id}, Name: {actor.name}")
+    people = get_people_by_movie_id(movie_id)
 
-    return render_template('movieinfo.html', movie=movie, actors=actors)
+    for person in people:
+        person.img = encode_image_url(person.img)
+        logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
+
+    return render_template('movieinfo.html', movie=movie, actors=people)
 
 @app.route('/people')
 def people():
@@ -218,6 +222,29 @@ def search_people():
         person.img = encode_image_url(person.img)
 
     return render_template('people.html', people=people, total_pages=total_pages, current_page=page, query=query)
+
+@app.route('/people/<int:person_id>')
+def personinfo(person_id):
+    person = Person.query.get(person_id)
+    if not person:
+        return abort(404)  # 如果没有找到演员，返回404错误
+
+    person.img = encode_image_url(person.img)
+
+    # 查询与该演员相关的所有电影
+    movies = (db.session.query(Movie)
+          .join(Relationships, Relationships.movie_id == Movie.id)
+          .filter(Relationships.person_id == person_id)
+          .all())
+
+    for movie in movies:
+        movie.img = encode_image_url(movie.img)
+    # 日志记录
+    logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
+    logger.debug(f"Movies for {person.name}: {[movie.name for movie in movies]}")
+
+    return render_template('personinfo.html', person=person, movies=movies)
+
 
 @app.route('/index')
 def index():

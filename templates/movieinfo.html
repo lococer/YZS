@@ -29,11 +29,6 @@
             font-size: 2.5em;
             color: #e0245e;
         }
-        .movie-header span {
-            display: block;
-            font-size: 1.2em;
-            color: #555;
-        }
         .movie-poster {
             width: 100%;
             height: auto;
@@ -58,6 +53,7 @@
             text-align: center;
             margin-bottom: 20px;
             color: #555;
+            cursor: pointer; /* Add cursor pointer to indicate clickable */
         }
         .actor {
             display: flex;
@@ -65,9 +61,6 @@
             margin-bottom: 10px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
-        }
-        .actor:last-child {
-            border-bottom: none;
         }
         .actor img {
             width: 50px;
@@ -84,12 +77,15 @@
             font-size: 0.9em;
             color: #777;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="movie-header">
-            <img src="{{ 'proxy-image/' + movie.img }}" alt="Movie Poster" class="movie-poster">
+            <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster" class="movie-poster">
             <h1>{{ movie.name }} ({{ movie.year }})</h1>
         </div>
         <div class="movie-details">
@@ -101,19 +97,43 @@
             <p><strong>Country:</strong> {{ movie.country }}</p>
         </div>
         <div class="actors-list">
-            <h2>Actors</h2>
+            <h2 onclick="toggleActors()">Actors</h2>
             {% for actor in actors %}
+            {% if loop.index <= 3 %}
             <div class="actor">
-                <img src="{{ 'proxy-image/' + actor.img }}" alt="Actor Profile Picture">
+                <img src="/proxy-image/{{ actor.img }}" alt="Actor Profile Picture">
                 <div>
-                    <p class="actor-name">{{ actor.name }}</p>
-                    <p class="actor-role">{{ actor.role }}</p>
+                    <a href="/people/{{ actor.id }}" class="actor-name">{{ actor.name }}</a>
                 </div>
             </div>
             {% else %}
-            <p>No actors found for this movie.</p>
+            <div class="actor hidden">
+                <img src="/proxy-image/{{ actor.img }}" alt="Actor Profile Picture">
+                <div>
+                    <a href="/people/{{ actor.id }}" class="actor-name">{{ actor.name }}</a>
+                </div>
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        function toggleActors() {
+            var actors = document.querySelectorAll('.actor');
+            var actorsListToggle = document.querySelector('.actors-list h2');
+            actors.forEach(function(actor, index) {
+                if (index > 2) {
+                    actor.classList.toggle('hidden');
+                }
+            });
+            // Toggle the text based on the state
+            if (actorsListToggle.textContent.includes('收起')) {
+                actorsListToggle.textContent = 'Actors';
+            } else {
+                actorsListToggle.textContent = 'Actors';
+            }
+        }
+    </script>
 </body>
 </html>

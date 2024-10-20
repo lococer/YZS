@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ person.name }} Information</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .person-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .person-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: #e0245e;
+        }
+        .person-photo {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .person-details {
+            margin-bottom: 20px;
+        }
+        .person-details p {
+            margin: 0;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .person-details strong {
+            color: #e0245e;
+        }
+        .movies-list {
+            margin-top: 20px;
+        }
+        .movies-list h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #555;
+            cursor: pointer; /* Add cursor pointer to indicate clickable */
+        }
+        .movie {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .movie img {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .movie-name {
+            font-size: 1.1em;
+            margin: 0;
+            color: #333;
+        }
+        .movie-role {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="person-header">
+        <img src="/proxy-image/{{ person.img }}" alt="Person Photo" class="person-photo">
+        <h1>{{ person.name }}</h1>
+    </div>
+    <div class="person-details">
+        <p><strong>Sex:</strong> {{ person.sex }}</p>
+        <p><strong>Birthday:</strong> {{ person.birthday }}</p>
+        <p><strong>Birthplace:</strong> {{ person.birthplace }}</p>
+        <p><strong>Summary:</strong> {{ person.summary }}</p>
+    </div>
+    <div class="movies-list">
+        <h2 onclick="toggleMovies()">Movies</h2>
+        {% for movie in movies %}
+        {% if loop.index <= 3 %}
+        <div class="movie">
+            <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster">
+            <div>
+                <a href="/movies/{{ movie.id }}" class="movie-name">{{ movie.name }}</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="movie hidden">
+            <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster">
+            <div>
+                <a href="/movies/{{ movie.id }}" class="movie-name">{{ movie.name }}</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    function toggleMovies() {
+        var movies = document.querySelectorAll('.movie');
+        var moviesListToggle = document.querySelector('.movies-list h2');
+        movies.forEach(function(movie, index) {
+            if (index > 2) {
+                movie.classList.toggle('hidden');
+            }
+        });
+        // Toggle the text based on the state
+        if (moviesListToggle.textContent.includes('收起')) {
+            moviesListToggle.textContent = 'Movies';
+        } else {
+            moviesListToggle.textContent = '收起';
+        }
+    }
+</script>
+</body>
+</html>
