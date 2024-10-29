@@ -150,7 +150,9 @@
                 <p><strong>性别:</strong> {{ person.sex }}</p>
                 <p><strong>生日:</strong> {{ person.birthday }}</p>
                 <p><strong>生源地:</strong> {{ person.birthplace }}</p>
-                <p><strong>简介:</strong> {{ person.summary }}</p>
+                <!-- <p><strong>简介:</strong> {{ person.summary }}</p> -->
+                <p><strong>简介:</strong> <span id="summary"></span></p>
+                <button id="toggleSummaryButton" onclick="toggleSummary()"></button>
             </div>
         </div>
 
@@ -232,10 +234,17 @@
                     myChart.setOption(option);
 
                     // 监听点击节点
-                    myChart.on('click', function (params){
-                        if( params.dataType === 'node' && params.data.url ){
-                            // console.log(params.data.url)
-                            window.open(params.data.url, '_blank');
+                    myChart.on('click', function (params) {
+                        const currentPath = window.location.pathname;
+                        if (params.dataType === 'node' && params.data.url && params.data.url != currentPath.substring( currentPath.lastIndexOf('/') + 1 )) {
+                            // 检测是否按下 Ctrl 键
+                            if (event.ctrlKey || event.metaKey) {
+                                // 在新窗口中打开 URL
+                                window.open(params.data.url, '_blank');
+                            } else {
+                                // 替换当前窗口的 URL
+                                window.location.href = params.data.url;
+                            }
                         }
                     });
                 })
@@ -264,6 +273,32 @@
                 moviesListToggle.textContent = '收起';
             }
         }
+    </script>
+    <script>
+        const summaryText = "{{ person.summary }}";
+        const maxlen = 200;
+        let isexpand = true;
+
+        // 显示函数
+        function updateSummary(){
+            const summaryElement = document.getElementById("summary");
+            summaryElement.textContent = isexpand ? summaryText : summaryText.substring(0, maxlen) + (summaryText.length > maxlen ? '...' : ''); 
+        }
+
+        // 按钮更新
+        function toggleSummary(){
+            isexpand = !isexpand;
+            updateSummary();
+            document.getElementById("toggleSummaryButton").textContent = isexpand ? "收起" : "展开";
+        }
+
+        document.addEventListener("DOMContentLoaded", function(){
+            toggleSummary();
+            if( summaryText.length <= maxlen ){
+                document.getElementById("toggleSummaryButton").style = "display:none";
+            }
+        })
+
     </script>
 </body>
 

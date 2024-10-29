@@ -129,6 +129,9 @@
 </head>
 
 <body>
+
+    <!-- TODO:对每个info添加head实现跳转 -->
+
     <div class="container">
         <div class="movie-container">
             <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster" class="movie-poster">
@@ -139,7 +142,9 @@
                 <p><strong>评价数:</strong> {{ movie.ratingsum }}</p>
                 <p><strong>标签:</strong> {% for tag in movie.tags %} {{ tag }} {% if not loop.last %}, {% endif %} {%
                     endfor %}</p>
-                <p><strong>简介:</strong> {{ movie.summary }}</p>
+                <!-- <p><strong>简介:</strong> {{ movie.summary }}</p> -->
+                <p><strong>简介:</strong> <span id="summary"></span></p>
+                <button id="toggleSummaryButton" onclick="toggleSummary()"></button>
                 <p><strong>题材:</strong> {{ movie.genre }}</p>
                 <p><strong>国家/地区:</strong> {{ movie.country }}</p>
             </div>
@@ -166,6 +171,8 @@
     </div>
     </div>
 
+    <!-- TODO 添加电影演员关系图 -->
+
     <script>
         function toggleActors() {
             var actors = document.querySelectorAll('.actor');
@@ -182,6 +189,31 @@
                 actorsListToggle.textContent = 'Actors';
             }
         }
+    </script>
+    <script>
+        const summaryText = "{{ movie.summary }}";
+        const maxlen = 100;
+        let isexpand = true;
+
+        // 显示函数
+        function updateSummary(){
+            const summaryElement = document.getElementById("summary");
+            summaryElement.textContent = isexpand ? summaryText : summaryText.substring(0, maxlen) + (summaryText.length > maxlen ? '...' : ''); 
+        }
+
+        // 按钮更新
+        function toggleSummary(){
+            isexpand = !isexpand;
+            updateSummary();
+            document.getElementById("toggleSummaryButton").textContent = isexpand ? "收起" : "展开";
+        }
+
+        document.addEventListener("DOMContentLoaded", function(){
+            toggleSummary();
+            if( summaryText.length <= maxlen ){
+                document.getElementById("toggleSummaryButton").style = "display:none";
+            }
+        })
     </script>
 </body>
 
