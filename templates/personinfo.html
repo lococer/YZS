@@ -201,9 +201,15 @@
                                     value: actor.name,
                                     itemStyle: {
                                         color: actor.name == personName ? '#ff0000' : '#5474c4'
-                                    }
+                                    },
+                                    url: actor.id
                                 })),
-                                links: data.links,
+                                // links: data.links,
+                                links: data.links.map(link =>({
+                                    source: link.source,
+                                    target: link.target,
+                                    value: link.value
+                                })),
                                 roam: true,  // 允许拖拽
                                 draggable: true,
                                 label: {
@@ -224,6 +230,14 @@
 
                     // 使用刚指定的配置项和数据显示图表
                     myChart.setOption(option);
+
+                    // 监听点击节点
+                    myChart.on('click', function (params){
+                        if( params.dataType === 'node' && params.data.url ){
+                            // console.log(params.data.url)
+                            window.open(params.data.url, '_blank');
+                        }
+                    });
                 })
                 .catch(error => console.error('Error loading JSON data:', error));
 
