@@ -31,8 +31,14 @@ app.jinja_env.globals.update({
 })
 
 # 配置数据库连接
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:leo@localhost:5432/postgres'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+import getpass
+if( getpass.getuser() != 'lococ' ):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:leo@localhost:5432/postgres'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lococ:lococ@localhost:5432/mydatabase'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 # 创建连接引擎和会话
 engine = create_engine('postgresql://postgres:leo@localhost:5432/postgres')
