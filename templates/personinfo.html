@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
             background-color: #f4f4f4;
             color: #333;
         }
+
         .container {
             max-width: 1200px;
             margin: 20px auto;
@@ -20,41 +22,51 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .person-header {
             text-align: center;
             margin-bottom: 20px;
         }
+
         .person-header h1 {
             margin: 0;
             font-size: 2.5em;
             color: #e0245e;
         }
+
         .person-photo {
             width: 100%;
             height: auto;
             border-radius: 4px;
             margin-bottom: 20px;
         }
+
         .person-details {
             margin-bottom: 20px;
         }
+
         .person-details p {
             margin: 0;
             font-size: 1.1em;
             margin-bottom: 10px;
         }
+
         .person-details strong {
             color: #e0245e;
         }
+
         .movies-list {
             margin-top: 20px;
         }
+
         .movies-list h2 {
             text-align: center;
             margin-bottom: 20px;
             color: #555;
-            cursor: pointer; /* Add cursor pointer to indicate clickable */
+            cursor: pointer;
+            /* Add cursor pointer to indicate clickable */
         }
+
         .movie {
             display: flex;
             align-items: center;
@@ -62,47 +74,94 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
+
         .movie img {
             width: 50px;
             height: 50px;
             border-radius: 4px;
             margin-right: 10px;
         }
+
         .movie-name {
             font-size: 1.1em;
             margin: 0;
             color: #333;
         }
+
         .movie-role {
             font-size: 0.9em;
             color: #777;
         }
+
         .hidden {
             display: none;
         }
+
+        .person-container {
+            display: flex;
+            /* 使用 flexbox 布局 */
+            align-items: center;
+            /* 垂直居中 */
+            justify-content: space-between;
+            /* 水平方向上均匀分布 */
+        }
+
+        .person-header {
+            display: flex;
+            flex-direction: column;
+            /* 头像和姓名保持垂直排列 */
+            margin-right: 20px;
+            /* 在头像和详情之间添加间距 */
+            text-align: center;
+            /* 图片和姓名居中对齐 */
+        }
+
+        .person-photo {
+            width: 150px;
+            /* 设置头像宽度 */
+            height: auto;
+            /* 保持宽高比 */
+            display: block;
+            /* 将图片设置为块级元素 */
+            margin: 0 auto;
+            /* 左右自动边距以居中 */
+            /* border-radius: 100%; 使图片为圆形，如果需要可以取消注释 */
+        }
+
+        .person-details {
+            flex-grow: 1;
+            /* 让详情部分尽可能扩展 */
+            max-width: 600px;
+            /* 设定最大宽度 */
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
 </head>
+
 <body>
-<div class="container">
-    <div class="person-header">
-        <img src="/proxy-image/{{ person.img }}" alt="Person Photo" class="person-photo">
-        <h1>{{ person.name }}</h1>
-    </div>
-    <div class="person-details">
-        <p><strong>Sex:</strong> {{ person.sex }}</p>
-        <p><strong>Birthday:</strong> {{ person.birthday }}</p>
-        <p><strong>Birthplace:</strong> {{ person.birthplace }}</p>
-        <p><strong>Summary:</strong> {{ person.summary }}</p>
-    </div>
-    <div class="movies-list">
-        <h2 onclick="toggleMovies()">Movies</h2>
-        {% for movie in movies %}
-        {% if loop.index <= 3 %}
-        <div class="movie">
-            <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster">
-            <div>
-                <a href="/movies/{{ movie.id }}" class="movie-name">{{ movie.name }}</a>
+    <div class="container">
+        <div class="person-container">
+            <div class="person-header">
+                <img src="/proxy-image/{{ person.img }}" alt="Person Photo" class="person-photo">
+                <!-- <h1>{{ person.name }}</h1> -->
             </div>
+            <div class="person-details">
+                <p><strong>名字:</strong> {{ person.name }} </p>
+                <p><strong>性别:</strong> {{ person.sex }}</p>
+                <p><strong>生日:</strong> {{ person.birthday }}</p>
+                <p><strong>生源地:</strong> {{ person.birthplace }}</p>
+                <p><strong>简介:</strong> {{ person.summary }}</p>
+            </div>
+        </div>
+
+        <div class="movies-list">
+            <h2 onclick="toggleMovies()">Movies</h2>
+            {% for movie in movies %}
+            {% if loop.index <= 3 %} <div class="movie">
+                <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster">
+                <div>
+                    <a href="/movies/{{ movie.id }}" class="movie-name">{{ movie.name }}</a>
+                </div>
         </div>
         {% else %}
         <div class="movie hidden">
@@ -114,24 +173,84 @@
         {% endif %}
         {% endfor %}
     </div>
-</div>
 
-<script>
-    function toggleMovies() {
-        var movies = document.querySelectorAll('.movie');
-        var moviesListToggle = document.querySelector('.movies-list h2');
-        movies.forEach(function(movie, index) {
-            if (index > 2) {
-                movie.classList.toggle('hidden');
+    <div id="actorGraph" style="width: 100%; height: 1000%;" posion="center">
+
+        <script>
+            // 基于准备好的 dom，初始化 echarts 实例
+            var myChart = echarts.init(document.getElementById('actorGraph'));
+
+            var personName = "{{ person.name }}";
+
+            // 使用 Fetch API 获取后端 Flask 提供的 JSON 数据
+            fetch('/require/people_relationship/{{person.id}}')
+                .then(response => response.json())  // 解析JSON
+                .then(data => {
+                    // 使用获取到的数据配置图表
+                    var option = {
+                        title: {
+                            text: '演员关系图'
+                        },
+                        tooltip: {},
+                        series: [
+                            {
+                                type: 'graph',
+                                layout: 'force',  // 使用力导向布局
+                                nodes: data.actors.map(actor => ({
+                                    name: actor.name,
+                                    value: actor.name,
+                                    itemStyle: {
+                                        color: actor.name == personName ? '#ff0000' : '#5474c4'
+                                    }
+                                })),
+                                links: data.links,
+                                roam: true,  // 允许拖拽
+                                draggable: true,
+                                label: {
+                                    show: true,
+                                    position: 'right',
+                                    formatter: '{b}'  // 显示演员名字
+                                },
+                                force: {
+                                    repulsion: 50,  // 设置节点之间的斥力
+                                    edgeLength: [50, 200]
+                                },
+                                layoutAnimation: true,
+                                focusNodeAdjacency: true,
+                            }
+                        ]
+                    };
+
+
+                    // 使用刚指定的配置项和数据显示图表
+                    myChart.setOption(option);
+                })
+                .catch(error => console.error('Error loading JSON data:', error));
+
+            // 在窗口大小变化时调整图表大小
+            window.addEventListener('resize', function () {
+                myChart.resize();
+            });
+        </script>
+    </div>
+
+    <script>
+        function toggleMovies() {
+            var movies = document.querySelectorAll('.movie');
+            var moviesListToggle = document.querySelector('.movies-list h2');
+            movies.forEach(function (movie, index) {
+                if (index > 2) {
+                    movie.classList.toggle('hidden');
+                }
+            });
+            // Toggle the text based on the state
+            if (moviesListToggle.textContent.includes('收起')) {
+                moviesListToggle.textContent = 'Movies';
+            } else {
+                moviesListToggle.textContent = '收起';
             }
-        });
-        // Toggle the text based on the state
-        if (moviesListToggle.textContent.includes('收起')) {
-            moviesListToggle.textContent = 'Movies';
-        } else {
-            moviesListToggle.textContent = '收起';
         }
-    }
-</script>
+    </script>
 </body>
+
 </html>

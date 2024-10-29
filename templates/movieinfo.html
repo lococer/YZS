@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
             background-color: #f4f4f4;
             color: #333;
         }
+
         .container {
             max-width: 1200px;
             margin: 20px auto;
@@ -20,7 +22,8 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .movie-header {
+
+        /* .movie-header {
             text-align: center;
             margin-bottom: 20px;
         }
@@ -45,16 +48,19 @@
         }
         .movie-details strong {
             color: #e0245e;
-        }
+        } */
         .actors-list {
             margin-top: 20px;
         }
+
         .actors-list h2 {
             text-align: center;
             margin-bottom: 20px;
             color: #555;
-            cursor: pointer; /* Add cursor pointer to indicate clickable */
+            cursor: pointer;
+            /* Add cursor pointer to indicate clickable */
         }
+
         .actor {
             display: flex;
             align-items: center;
@@ -62,67 +68,109 @@
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
+
         .actor img {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             margin-right: 10px;
         }
+
         .actor-name {
             font-size: 1.1em;
             margin: 0;
             color: #333;
         }
+
         .actor-role {
             font-size: 0.9em;
             color: #777;
         }
+
         .hidden {
             display: none;
         }
+
+        .movie-container {
+            display: flex;
+            /* 使用 flexbox 布局 */
+            align-items: center;
+            /* 垂直居中 */
+            justify-content: space-between;
+            /* 水平方向上均匀分布 */
+        }
+
+        .movie-header {
+            display: flex;
+            flex-direction: column;
+            /* 头像和姓名保持垂直排列 */
+            margin-right: 20px;
+            /* 在头像和详情之间添加间距 */
+            text-align: center;
+            /* 图片和姓名居中对齐 */
+        }
+
+        .movie-photo {
+            width: 150px;
+            /* 设置头像宽度 */
+            height: auto;
+            /* 保持宽高比 */
+            border-radius: 100%;
+            /* 使图片为圆形 */
+        }
+
+        .movie-details {
+            flex-grow: 1;
+            /* 让详情部分尽可能扩展 */
+            max-width: 600px;
+            /* 设定最大宽度 */
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div class="movie-header">
+        <div class="movie-container">
             <img src="/proxy-image/{{ movie.img }}" alt="Movie Poster" class="movie-poster">
-            <h1>{{ movie.name }} ({{ movie.year }})</h1>
+            <!-- <h1>{{ movie.name }} ({{ movie.year }})</h1> -->
+            <div class="movie-details">
+                <p><strong>电影名:</strong>{{ movie.name }}</p>
+                <p><strong>评分:</strong> {{ movie.rating }}</p>
+                <p><strong>评价数:</strong> {{ movie.ratingsum }}</p>
+                <p><strong>标签:</strong> {% for tag in movie.tags %} {{ tag }} {% if not loop.last %}, {% endif %} {%
+                    endfor %}</p>
+                <p><strong>简介:</strong> {{ movie.summary }}</p>
+                <p><strong>题材:</strong> {{ movie.genre }}</p>
+                <p><strong>国家/地区:</strong> {{ movie.country }}</p>
+            </div>
         </div>
-        <div class="movie-details">
-            <p><strong>Rating:</strong> {{ movie.rating }}</p>
-            <p><strong>Rating Sum:</strong> {{ movie.ratingsum }}</p>
-            <p><strong>Tags:</strong> {% for tag in movie.tags %} {{ tag }} {% if not loop.last %}, {% endif %} {% endfor %}</p>
-            <p><strong>Summary:</strong> {{ movie.summary }}</p>
-            <p><strong>Genre:</strong> {{ movie.genre }}</p>
-            <p><strong>Country:</strong> {{ movie.country }}</p>
-        </div>
+
         <div class="actors-list">
             <h2 onclick="toggleActors()">Actors</h2>
             {% for actor in actors %}
-            {% if loop.index <= 3 %}
-            <div class="actor">
+            {% if loop.index <= 3 %} <div class="actor">
                 <img src="/proxy-image/{{ actor.img }}" alt="Actor Profile Picture">
                 <div>
                     <a href="/people/{{ actor.id }}" class="actor-name">{{ actor.name }}</a>
                 </div>
-            </div>
-            {% else %}
-            <div class="actor hidden">
-                <img src="/proxy-image/{{ actor.img }}" alt="Actor Profile Picture">
-                <div>
-                    <a href="/people/{{ actor.id }}" class="actor-name">{{ actor.name }}</a>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
         </div>
+        {% else %}
+        <div class="actor hidden">
+            <img src="/proxy-image/{{ actor.img }}" alt="Actor Profile Picture">
+            <div>
+                <a href="/people/{{ actor.id }}" class="actor-name">{{ actor.name }}</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
     </div>
 
     <script>
         function toggleActors() {
             var actors = document.querySelectorAll('.actor');
             var actorsListToggle = document.querySelector('.actors-list h2');
-            actors.forEach(function(actor, index) {
+            actors.forEach(function (actor, index) {
                 if (index > 2) {
                     actor.classList.toggle('hidden');
                 }
@@ -136,4 +184,5 @@
         }
     </script>
 </body>
+
 </html>
