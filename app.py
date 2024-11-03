@@ -9,6 +9,8 @@ from jinja2 import Template
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+import re
+from urllib.parse import urlencode
 
 # 配置文件日志处理器
 file_handler = logging.FileHandler('app.log')  # 指定日志文件
@@ -142,13 +144,54 @@ def movies():
 
 @app.route('/movies/search')
 def search_movies():
-    query = request.args.get('q', '')
+    queries = request.args.getlist('q[]')
+    categories = request.args.getlist('category[]')
 
-    logger.debug(f"查询{query}电影")
-    
-    # 使用模糊查询搜索电影
-    search_pattern = f"%{query}%"
-    search_results = Movie.query.filter(Movie.name.ilike(search_pattern)).all()
+    logger.debug(queries)
+    logger.debug(categories)
+
+    logger.debug(f"类别: {categories}，查询: {queries}")
+
+    # 初始化查询
+    query = Movie.query
+
+    # 处理演员名称的列表以避免重复连接
+    actor_ids = set()
+
+    # 逐个添加过滤条件
+    for category, query_text in zip(categories, queries):
+        logger.debug(f"类别: {category}, 查询: {query_text}")
+        if category == 'movieName':
+            query = query.filter(Movie.name.ilike(f"%{query_text}%"))
+        elif category == 'year':
+            try:
+                year = int(query_text)
+                query = query.filter(Movie.year == year)
+            except ValueError:
+                logger.warning(f"无效年份: {query_text}")
+                continue  # 忽略无效的年份
+        elif category == 'country':
+            query = query.filter(Movie.country.ilike(f"%{query_text}%"))
+        elif category == 'actorName':  # 新增对演员名称的处理
+            actor = Person.query.filter(Person.name.ilike(f"%{query_text}%")).first()  # 获取第一个匹配的演员
+            if actor:
+                actor_ids.add(actor.id)  # 加入演员 ID 集合
+            else:
+                logger.warning(f"未找到演员: {query_text}")
+                continue  # 忽略未找到的演员
+        else:
+            logger.warning(f"未知类别: {category}")
+            continue  # 忽略未知类别
+
+    if actor_ids:
+        # 确保从 Movie 表开始，并与 Relationships 表联接
+        query = query.join(Relationships, Relationships.movie_id == Movie.id)
+
+        # 添加过滤条件：筛选 person_id 在 actor_ids 列表中的记录
+        query = query.filter(Relationships.person_id.in_(actor_ids))
+
+    # 执行查询
+    search_results = query.all()
 
     # 获取当前页数
     page = request.args.get('page', 1, type=int)
@@ -161,6 +204,8 @@ def search_movies():
         movie.img = encode_image_url(movie.img)
 
     return render_template('movies.html', movies=movies, total_pages=total_pages, current_page=page, query=query)
+
+
 
 # 查询特定电影的所有演员
 def get_people_by_movie_id(movie_id):
@@ -200,8 +245,8 @@ def people():
     people, total_pages = paginate_items(all_people, page)
     
     # 日志
-    logger.debug(f"Query all people, total: {len(all_people)}, page: {page}")
-    logger.debug(f"First person: {people[0].name if people else 'No people found'}")
+    # logger.debug(f"Query all people, total: {len(all_people)}, page: {page}")
+    # logger.debug(f"First person: {people[0].name if people else 'No people found'}")
 
     for person in people:
         person.img = encode_image_url(person.img)
@@ -227,7 +272,7 @@ def find_coactors(person_id):
             .filter(Relationships.movie_id.in_(actor_movies))
             .group_by(Person.id, Person.name)
             .order_by(func.count(Relationships.movie_id).desc())
-            .limit(15)  # 限制返回前10个合作演员
+            .limit(10)  # 限制返回前10个合作演员
             .all()
         )
 
@@ -270,7 +315,9 @@ def find_coactors(person_id):
                     "source": actor1_name,
                     "target": actor2_name,
                     "common_movie_ids": common_movie_ids,
-                    "value": len(common_movie_ids)  # 可以选择更有意义的值
+                    "value": len(common_movie_ids),  # 可以选择更有意义的值
+                    # "common_movies": [Movie.query.get(movie_id) for movie_id in common_movie_ids]
+                    "url": create_search_url("", ["actorName", "actorName"], [actor1_name, actor2_name]),
                 })
 
         result["links"] = relationships
@@ -279,7 +326,7 @@ def find_coactors(person_id):
     except Exception as err:
         logger.error("query coactors error: " + str(err))
     
-    logger.debug(result)
+    # logger.debug(result)
     return jsonify(result)
 
 @app.route('/require/people_relationship/<int:people_id>')
@@ -298,13 +345,29 @@ def people_relationship(people_id):
 
 @app.route('/people/search')
 def search_people():
-    query = request.args.get('q', '')
+    queries = request.args.getlist('q[]')  # 获取所有查询参数
+    categories = request.args.getlist('category[]')  # 获取所有类别参数
 
-    logger.debug(f"查询{query}影人")
-    
-    # 使用模糊查询搜索电影
-    search_pattern = f"%{query}%"
-    search_results = Person.query.filter(Person.name.ilike(search_pattern)).all()
+    logger.debug(queries)
+    logger.debug(categories)
+
+    logger.debug(f"类别: {categories}，查询: {queries}")
+
+    # 初始化查询
+    query = Person.query
+
+    # 逐个添加过滤条件
+    for category, query_text in zip(categories, queries):
+        logger.debug(f"类别: {category}, 查询: {query_text}")
+        if category == 'name':
+            query = query.filter(Person.name.ilike(f"%{query_text}%"))
+        elif category == 'sex':
+            query = query.filter(Person.sex.ilike(f"%{query_text}%"))
+        elif category == 'birthplace':
+            query = query.filter(Person.birthplace.ilike(f"%{query_text}%"))
+
+    # 执行查询
+    search_results = query.all()
 
     # 获取当前页数
     page = request.args.get('page', 1, type=int)
@@ -312,11 +375,12 @@ def search_people():
     # 使用分页函数
     people, total_pages = paginate_items(search_results, page)
 
-    # 为每个电影封面编码URL
+    # 为每个人物编码图片 URL
     for person in people:
         person.img = encode_image_url(person.img)
 
-    return render_template('people.html', people=people, total_pages=total_pages, current_page=page, query=query)
+    return render_template('people.html', people=people, total_pages=total_pages, current_page=page, query=queries)
+
 
 @app.route('/people/<int:person_id>')
 def personinfo(person_id):
@@ -348,27 +412,27 @@ def index():
 # 代理图片的路由，接收 Base64 编码的 URL
 @app.route('/proxy-image/<path:encoded_url>')
 def proxy_image(encoded_url):
-    logger.debug("get picture") 
-    logger.debug(encoded_url)
-    logger.debug(base64.urlsafe_b64decode(encoded_url).decode('utf-8'))
+    # logger.debug("get picture") 
+    # logger.debug(encoded_url)
+    # logger.debug(base64.urlsafe_b64decode(encoded_url).decode('utf-8'))
     # print("get movie picture", encoded_url, base64.urlsafe_b64decode(encoded_url).decode('utf-8'))
     try:
-        logger.debug("OK0")
+        # logger.debug("OK0")
         # Base64 解码 URL
         image_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
         
-        logger.debug("OK1")
+        # logger.debug("OK1")
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
         # 请求图片数据
         response = requests.get(image_url, headers=headers)
 
-        logger.debug("OK2")
-        logger.debug(f"Decoded image URL: {image_url}")
-        logger.debug(f"Image request status: {response.status_code}")
+        # logger.debug("OK2")
+        # logger.debug(f"Decoded image URL: {image_url}")
+        # logger.debug(f"Image request status: {response.status_code}")
         
-        logger.debug("OK3")
+        # logger.debug("OK3")
         if response.status_code == 200:
             img = BytesIO(response.content)
             return send_file(img, mimetype='image/webp')
@@ -377,6 +441,24 @@ def proxy_image(encoded_url):
     except Exception as e:
         logger.debug("picture failed" + e)
         return abort(400)  # 如果解码出错，返回 400 错误
+
+def create_search_url(base_url, categories, queries):
+    # 构建查询参数
+    params = []
+    for category, query in zip(categories, queries):
+        params.append(('category[]', category))
+        params.append(('q[]', query))
+    
+    # 使用 urlencode 构建完整的查询字符串
+    query_string = urlencode(params, doseq=True)
+    return f"{base_url}?{query_string}"
+
+def split_name(name):
+    # 使用正则表达式分离中文和英文
+    chinese_part = ''.join(re.findall(r'[\u4e00-\u9fa5]+', name))  # 匹配中文字符
+    english_part = ''.join(re.findall(r'[A-Za-z]+', name))  # 匹配英文字符
+    
+    return chinese_part, english_part
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5001,debug=True)

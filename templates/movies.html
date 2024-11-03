@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-< lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -31,7 +30,7 @@
 
 </head>
 
-<>
+<body>
     <!-- ======= Header ======= -->
     <header id="header">
         <div class="container">
@@ -47,7 +46,7 @@
                     <li><a href="/index">Home <i class="la la-angle-down"></i></a></li>
                     <li class="active"><a href="/movies">电影</a></li>
                     <li><a href="/people">影人</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
+                    <!-- <li><a href="#portfolio">Portfolio</a></li>
                     <li><a href="#team">Team</a></li>
                     <li class="drop-down"><a href="">Drop Down</a>
                         <ul>
@@ -66,25 +65,33 @@
                             <li><a href="#">Drop Down 5</a></li>
                         </ul>
                     </li>
-                    <li><a href="#contact">Contact Us</a></li>
+                    <li><a href="#contact">Contact Us</a></li> -->
                 </ul>
             </nav><!-- .nav-menu -->
 
         </div>
     </header><!-- End Header -->
 
-    <div>
+    <div style="text-align: center;">
         <h1>Search Movies</h1>
-
         <!-- Search form -->
         <form id="searchForm" action="/movies/search" method="get">
-            <input type="text" id="searchQuery" name="q" placeholder="Search for a movie..." required>
+            <div id="searchContainer">
+                <div class="search-item">
+                    <select name="category[]">
+                        <option value="movieName">电影名</option>
+                        <option value="year">年份</option>
+                        <option value="country">国家</option>
+                        <option value="actorName">演员名</option>
+                    </select>
+                    <input type="text" name="q[]" placeholder="Search for a movie..." required>
+                </div>
+            </div>
+            <button type="button" id="addSearchBox">+</button>
+            <button type="button" id="deleteSearchBox">-</button>
             <button type="submit">Search</button>
         </form>
-    </div>
-
-    <div>
-        <!-- TODO 添加电影分类搜索-->
+        <!-- TODO 实现结果排序 -->
     </div>
 
     <div class="movie-container">
@@ -153,6 +160,32 @@
 
     <!-- Template Main JS File -->
     <script src="../static/assets/js/main.js"></script>
+
+    <script>
+        document.getElementById('addSearchBox').addEventListener('click', function () {
+            // 创建新的搜索框
+            var newSearchItem = document.createElement('div');
+            newSearchItem.className = 'search-item';
+
+            newSearchItem.innerHTML = `
+            <select id="searchCategory" name="category[]"> <option value="movieName">电影名</option>
+                <option value="year">年份</option>
+                <option value="country">国家</option>
+            </select>
+            <input type="text" id="searchQuery" name="q[]" placeholder="Search for a movie..." required>
+        `;
+            // 将新搜索框添加到搜索容器中
+            document.getElementById('searchContainer').appendChild(newSearchItem);
+        });
+
+        // 删除搜索框
+        document.getElementById('deleteSearchBox').addEventListener('click', function (event) {
+            // 删除最后一个搜索框
+            var searchContainer = document.getElementById('searchContainer');
+            var lastSearchItem = searchContainer.lastChild;
+            searchContainer.removeChild(lastSearchItem);
+        });
+    </script>
 
 </body>
 
