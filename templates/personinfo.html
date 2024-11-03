@@ -224,7 +224,6 @@
     </div>
 
     <div id="actorGraph" style="width: 100%; height: 1000%;" posion="center">
-
         <script>
             // 基于准备好的 dom，初始化 echarts 实例
             var myChart = echarts.init(document.getElementById('actorGraph'));
@@ -236,6 +235,12 @@
                 .then(response => response.json())  // 解析JSON
                 .then(data => {
                     // 使用获取到的数据配置图表
+                    console.log(data.actors.map(actor => {
+                        return {
+                            name: actor.name,
+                            // value: actor.value,
+                        }
+                    }))
                     var option = {
                         title: {
                             text: '演员关系图'

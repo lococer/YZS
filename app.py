@@ -83,8 +83,9 @@ class Relationships(db.Model):
     __tablename__ = 'relationships'
 
     movie_id = db.Column(db.Integer)
-    person_id = db.Column(db.Integer,primary_key=True)
+    person_id = db.Column(db.Integer)
     role = db.Column(db.String(100))
+    id = db.Column(db.Integer, primary_key=True)
 
 
 # 创建数据库表
@@ -231,6 +232,8 @@ def movieinfo(movie_id):
         person.img = encode_image_url(person.img)
         logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
 
+    logger.debug(movie)
+
     return render_template('movieinfo.html', movie=movie, actors=people)
 
 @app.route('/people')
@@ -276,14 +279,14 @@ def find_coactors(person_id):
             .all()
         )
 
-        logger.debug(coactors)
+        # logger.debug(coactors)
         
         # 将共同演员的 ID 和名称加入结果
         result["actors"] = [{"id": actor.id, "name": actor.name} for actor in coactors]
         
         # 获取共同演员之间的所有组合
         actor_list = [(actor.id, actor.name) for actor in coactors]  # 获取演员 ID 和名称的列表
-        logger.debug(str(len(actor_list)))
+        # logger.debug(str(len(actor_list)))
 
         # 查询所有共同电影 ID
         coactor_pairs = [(actor1.id, actor2.id) for actor1, actor2 in combinations(coactors, 2)]
@@ -326,7 +329,7 @@ def find_coactors(person_id):
     except Exception as err:
         logger.error("query coactors error: " + str(err))
     
-    # logger.debug(result)
+    logger.debug(result)
     return jsonify(result)
 
 @app.route('/require/people_relationship/<int:people_id>')
@@ -336,6 +339,68 @@ def require_people_relationship(people_id):
     coactors = find_coactors(person_id=people_id)
 
     return coactors
+
+@app.route('/require/movie_relationship/<int:movie_id>')
+def require_movie_relationship(movie_id):
+    """返回 JSON，指定电影的所有演员和导演"""
+    logger.debug(f"Query movie {movie_id} information")
+
+    movie = Movie.query.get(movie_id)
+    if not movie:
+        return jsonify({'error': 'Movie not found'}), 404
+
+    # 查询与电影相关的演员和导演
+    relationships = Relationships.query.filter_by(movie_id=movie_id).all()
+    logger.debug(f"Total relationships found: {len(relationships)}")
+
+    actors = []
+    director = None
+
+    for relationship in relationships:
+        person = Person.query.get(relationship.person_id)
+        logger.debug(f"Person ID: {person.id if person else 'None'}, Name: {person.name if person else 'None'}, Role: {relationship.role}")
+        if relationship.role == "director":
+            director = person.name if person else None
+        else:
+            if person:
+                actors.append(person.name)
+    
+    actors = actors[:5]  # 限制返回前 5 个演员
+
+    result = {}
+
+    # 构建返回的数据结构以适应 ECharts graph
+    result["actors"] = [{"name": movie.name, "value": 1}]  # 添加电影节点
+    if director:
+        result["actors"].append({"name": director, "value": 1})  # 添加导演节点
+    for actor in actors:
+        result["actors"].append({"name": actor, "value": 1})  # 添加演员节点
+
+    # 创建链接
+    links = []
+    if director:
+        links.append({"source": movie.name, "target": director})  # 电影到导演的链接
+    for actor in actors:
+        links.append({"source": movie.name, "target": actor})  # 电影到演员的链接
+
+    # 打印调试信息以检查节点和链接
+    # logger.debug(f"Nodes: {nodes}")
+    # logger.debug(f"Links: {links}")
+
+    # result = {
+    #     'actors': nodes,
+    #     'links': links,
+    # }
+
+    # result = {}
+    # result['actors'] = nodes
+    result["links"] = links
+    
+    logger.debug(result)
+
+    return jsonify(result)
+
+
 
 @app.route('/people_relationship/<int:people_id>')
 def people_relationship(people_id):

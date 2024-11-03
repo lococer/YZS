@@ -10,7 +10,9 @@
     <link href="../static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900"
+        rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="../static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -143,6 +145,7 @@
             /* 设定最大宽度 */
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
 </head>
 
 <body>
@@ -159,19 +162,6 @@
                     <li><a href="/index">主页</a></li>
                     <li class="active"><a href="/movies">电影</a></li>
                     <li><a href="/people">影人</a></li>
-                    <!-- <li><a href="#services">Services</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#team">Team</a></li>
-                    <li class="drop-down"><a href="">Drop Down</a>
-                        <ul>
-                            <li><a href="#">Drop Down 1</a></li>
-                            <li><a href="#">Drop Down 2</a></li>
-                            <li><a href="#">Drop Down 3</a></li>
-                            <li><a href="#">Drop Down 4</a></li>
-                            <li><a href="#">Drop Down 5</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#contact">Contact Us</a></li> -->
                 </ul>
             </nav><!-- .nav-menu -->
         </div>
@@ -183,6 +173,7 @@
             <!-- <h1>{{ movie.name }} ({{ movie.year }})</h1> -->
             <div class="movie-details">
                 <p><strong>电影名:</strong>{{ movie.name }}</p>
+                <!-- <p><strong>导演:</strong> {{ movie.director }}</p> -->
                 <p><strong>年份:</strong>{{ movie.year }}</p>
                 <p><strong>评分:</strong> {{ movie.rating }}</p>
                 <p><strong>评价数:</strong> {{ movie.ratingsum }}</p>
@@ -215,9 +206,73 @@
         {% endif %}
         {% endfor %}
     </div>
-    </div>
 
     <!-- TODO 添加电影演员关系图 -->
+
+    <div id="actorGraph" style="width: 100%; height: 1000%;" posion="center">
+        <script>
+            // 基于准备好的 dom，初始化 echarts 实例
+            var myChart = echarts.init(document.getElementById('actorGraph'));
+
+            // 使用 Fetch API 获取后端 Flask 提供的 JSON 数据
+            // fetch('/require/people_relationship/1274267')
+            fetch('/require/movie_relationship/{{ movie.id }}')
+                .then(response => response.json())  // 解析JSON
+                .then(data => {
+                    // 使用获取到的数据配置图表
+                    console.log(data.actors.map(actor => {
+                        return {
+                            name: actor.name,
+                            // value: actor.value,
+                        }
+                    }))
+                    var option = {
+                        title: {
+                            text: '演员关系图'
+                        },
+                        tooltip: {},
+                        series: [
+                            {
+                                type: 'graph',
+                                layout: 'force',  // 使用力导向布局
+                                nodes: data.actors.map(actor => ({
+                                    name: actor.name,
+                                    // value: actor.name,
+                                })),
+                                // links: data.links,
+                                links: data.links.map(link =>({
+                                    source: link.source,
+                                    target: link.target,
+                                })),
+                                roam: true,  // 允许拖拽
+                                draggable: true,
+                                label: {
+                                    show: true,
+                                    position: 'right',
+                                    formatter: '{b}'  // 显示演员名字
+                                },
+                                force: {
+                                    repulsion: 50,  // 设置节点之间的斥力
+                                    edgeLength: [50, 200]
+                                },
+                                layoutAnimation: true,
+                                focusNodeAdjacency: true,
+                            }
+                        ]
+                    };
+
+                    // 使用刚指定的配置项和数据显示图表
+                    myChart.setOption(option);
+
+                })
+                .catch(error => console.error('Error loading JSON data:', error));
+
+            // 在窗口大小变化时调整图表大小
+            window.addEventListener('resize', function () {
+                myChart.resize();
+            });
+        </script>
+    </div>
 
     <script>
         function toggleActors() {
@@ -242,21 +297,21 @@
         let isexpand = true;
 
         // 显示函数
-        function updateSummary(){
+        function updateSummary() {
             const summaryElement = document.getElementById("summary");
-            summaryElement.textContent = isexpand ? summaryText : summaryText.substring(0, maxlen) + (summaryText.length > maxlen ? '...' : ''); 
+            summaryElement.textContent = isexpand ? summaryText : summaryText.substring(0, maxlen) + (summaryText.length > maxlen ? '...' : '');
         }
 
         // 按钮更新
-        function toggleSummary(){
+        function toggleSummary() {
             isexpand = !isexpand;
             updateSummary();
             document.getElementById("toggleSummaryButton").textContent = isexpand ? "收起" : "展开";
         }
 
-        document.addEventListener("DOMContentLoaded", function(){
+        document.addEventListener("DOMContentLoaded", function () {
             toggleSummary();
-            if( summaryText.length <= maxlen ){
+            if (summaryText.length <= maxlen) {
                 document.getElementById("toggleSummaryButton").style = "display:none";
             }
         })
