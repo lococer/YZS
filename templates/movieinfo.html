@@ -177,6 +177,7 @@
                 <p><strong>年份:</strong>{{ movie.year }}</p>
                 <p><strong>评分:</strong> {{ movie.rating }}</p>
                 <p><strong>评价数:</strong> {{ movie.ratingsum }}</p>
+                <p><strong>导演:</strong> {{ movie.directorName }}</p>
                 <p><strong>标签:</strong> {% for tag in movie.tags %} {{ tag }} {% if not loop.last %}, {% endif %} {%
                     endfor %}</p>
                 <!-- <p><strong>简介:</strong> {{ movie.summary }}</p> -->
@@ -213,6 +214,8 @@
         <script>
             // 基于准备好的 dom，初始化 echarts 实例
             var myChart = echarts.init(document.getElementById('actorGraph'));
+            
+            var directorName = "{{movie.director}}"
 
             // 使用 Fetch API 获取后端 Flask 提供的 JSON 数据
             // fetch('/require/people_relationship/1274267')
@@ -220,12 +223,13 @@
                 .then(response => response.json())  // 解析JSON
                 .then(data => {
                     // 使用获取到的数据配置图表
-                    console.log(data.actors.map(actor => {
-                        return {
-                            name: actor.name,
-                            // value: actor.value,
-                        }
-                    }))
+                    // console.log(data.actors.map(actor => {
+                    //     return {
+                    //         name: actor.name,
+                    //         // value: actor.value,
+                    //     }
+                    // }))
+
                     var option = {
                         title: {
                             text: '演员关系图'
@@ -237,7 +241,10 @@
                                 layout: 'force',  // 使用力导向布局
                                 nodes: data.actors.map(actor => ({
                                     name: actor.name,
-                                    // value: actor.name,
+                                    value: actor.value,
+                                    ItemStyle:{
+                                        color: actor.name == directorName ? '#ff0000' : '#5474c4'
+                                    },
                                 })),
                                 // links: data.links,
                                 links: data.links.map(link =>({

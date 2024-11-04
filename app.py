@@ -209,13 +209,16 @@ def search_movies():
 
 
 # 查询特定电影的所有演员
-def get_people_by_movie_id(movie_id):
+def get_people_by_movie_id(movie_id, role=None):
     query = (
         db.session.query(Person)
         .select_from(Relationships)
         .join(Person, Relationships.person_id == Person.id)
         .filter(Relationships.movie_id == movie_id)
     )
+    if( role is not None ):
+        query = query.filter(Relationships.role == role)
+
     return query.all()
 
 @app.route('/movies/<int:movie_id>')
@@ -231,6 +234,8 @@ def movieinfo(movie_id):
     for person in people:
         person.img = encode_image_url(person.img)
         logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
+    
+    movie.directorName = get_people_by_movie_id(movie_id, role="director")[0].name if get_people_by_movie_id(movie_id, role="director") else None
 
     logger.debug(movie)
 
@@ -365,16 +370,18 @@ def require_movie_relationship(movie_id):
             if person:
                 actors.append(person.name)
     
-    actors = actors[:5]  # 限制返回前 5 个演员
+    # actors = actors[:5]  # 限制返回前 5 个演员
+
+    actors = list(set(actors))[:20]  # 去重
 
     result = {}
 
     # 构建返回的数据结构以适应 ECharts graph
-    result["actors"] = [{"name": movie.name, "value": 1}]  # 添加电影节点
+    result["actors"] = [{"name": movie.name, "value": "电影"}]  # 添加电影节点
     if director:
-        result["actors"].append({"name": director, "value": 1})  # 添加导演节点
+        result["actors"].append({"name": director, "value": "导演"})  # 添加导演节点
     for actor in actors:
-        result["actors"].append({"name": actor, "value": 1})  # 添加演员节点
+        result["actors"].append({"name": actor, "value": "参演"})  # 添加演员节点
 
     # 创建链接
     links = []
