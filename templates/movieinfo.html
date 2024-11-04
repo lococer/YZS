@@ -149,7 +149,6 @@
 </head>
 
 <body>
-
     <!-- TODO:对每个info添加head实现跳转 -->
     <!-- ======= Header ======= -->
     <header id="header">
@@ -214,7 +213,7 @@
         <script>
             // 基于准备好的 dom，初始化 echarts 实例
             var myChart = echarts.init(document.getElementById('actorGraph'));
-            
+
             var directorName = "{{movie.director}}"
 
             // 使用 Fetch API 获取后端 Flask 提供的 JSON 数据
@@ -222,14 +221,6 @@
             fetch('/require/movie_relationship/{{ movie.id }}')
                 .then(response => response.json())  // 解析JSON
                 .then(data => {
-                    // 使用获取到的数据配置图表
-                    // console.log(data.actors.map(actor => {
-                    //     return {
-                    //         name: actor.name,
-                    //         // value: actor.value,
-                    //     }
-                    // }))
-
                     var option = {
                         title: {
                             text: '演员关系图'
@@ -242,12 +233,12 @@
                                 nodes: data.actors.map(actor => ({
                                     name: actor.name,
                                     value: actor.value,
-                                    ItemStyle:{
+                                    ItemStyle: {
                                         color: actor.name == directorName ? '#ff0000' : '#5474c4'
                                     },
                                 })),
                                 // links: data.links,
-                                links: data.links.map(link =>({
+                                links: data.links.map(link => ({
                                     source: link.source,
                                     target: link.target,
                                 })),
@@ -278,6 +269,178 @@
             window.addEventListener('resize', function () {
                 myChart.resize();
             });
+        </script>
+    </div>
+
+    <div>
+        <style>
+
+            .scrollable-comments {
+                max-height: 300px;
+                /* 设置固定高度 */
+                overflow-y: auto;
+                /* 启用垂直滚动 */
+                border: 1px solid #ccc;
+                /* 添加边框 */
+                border-radius: 5px;
+                /* 圆角 */
+                padding: 10px;
+                /* 内边距 */
+                margin-bottom: 10px;
+                /* 下边距 */
+                background-color: #ffffff;
+                /* 背景颜色 */
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                /* 阴影效果 */
+            }
+
+            .comment {
+                margin-bottom: 10px;
+                /* 每条评论的下边距 */
+                padding: 8px;
+                /* 每条评论的内边距 */
+                border: 1px solid #e0e0e0;
+                /* 评论边框 */
+                border-radius: 5px;
+                /* 圆角 */
+                background-color: #f1f1f1;
+                /* 评论背景 */
+            }
+
+            .comment strong {
+                color: #007bff;
+                /* 用户名颜色 */
+            }
+
+            button {
+                padding: 10px 15px;
+                /* 按钮内边距 */
+                border: none;
+                /* 去除边框 */
+                border-radius: 5px;
+                /* 圆角 */
+                background-color: #007bff;
+                /* 按钮背景颜色 */
+                color: white;
+                /* 按钮字体颜色 */
+                cursor: pointer;
+                /* 鼠标指针效果 */
+                font-size: 16px;
+                /* 字体大小 */
+                transition: background-color 0.3s;
+                /* 背景颜色变化过渡 */
+            }
+
+            button:hover {
+                background-color: #0056b3;
+                /* 悬停时的背景颜色 */
+            }
+
+            button:focus {
+                outline: none;
+                /* 去除聚焦时的边框 */
+            }
+        </style>
+
+        <div id="movieCommentsContainer">
+            <h2>电影评论</h2>
+            <div id="movieComments" class="scrollable-comments">
+            </div>
+            <button id="toggleButton">展开更多</button>
+        </div>
+
+        <script>
+            let currentCount = 10; // 当前显示的评论数量
+            let comments = []; // 存储获取到的评论
+
+            // 获取评论的函数
+            function fetchComments(movieId) {
+                fetch("/require/movie_comments/{{ movie.id }}")
+                    .then(response => {
+                        // if (!response.ok) {
+                        //     throw new Error('网络错误');
+                        // }
+                        return response.json();
+                    })
+                    .then(data => {
+                        comments = data; // 将评论数据存储到全局变量
+                        displayComments(); // 显示初始评论
+                    })
+                    .catch(error => {
+                        console.error('获取评论失败:', error);
+                    });
+            }
+
+            // 显示评论的函数
+            function displayComments() {
+                const commentsContainer = document.getElementById('movieComments');
+                commentsContainer.innerHTML = '';
+
+                const displayedComments = comments.slice(0, currentCount); // 仅显示前 currentCount 条评论
+
+                if (displayedComments.length === 0) {
+                    commentsContainer.innerHTML = '<p>暂无评论。</p>';
+                    return;
+                }
+
+                displayedComments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.className = 'comment';
+
+                    const usernameStrong = document.createElement('strong');
+                    usernameStrong.textContent = comment.username + ':';
+
+                    const commentParagraph = document.createElement('p');
+                    commentParagraph.textContent = comment.comment;
+
+                    commentDiv.appendChild(usernameStrong);
+                    commentDiv.appendChild(commentParagraph);
+                    commentsContainer.appendChild(commentDiv);
+                });
+
+                updateToggleButton();
+            }
+
+            // 更新按钮文本和功能
+            function updateToggleButton() {
+                const commentsContainer = document.getElementById('movieCommentsContainer');
+                const toggleButton = document.getElementById('toggleButton');
+
+                // 移除已有的收起按钮
+                const existingCollapseButton = document.getElementById('collapseButton');
+                if (existingCollapseButton) {
+                    existingCollapseButton.remove();
+                }
+
+                if (currentCount < comments.length) {
+                    toggleButton.textContent = '展开更多';
+                    toggleButton.onclick = () => {
+                        currentCount += 10; // 增加显示的评论数量
+                        displayComments(); // 重新显示评论
+                    };
+                } else {
+                    toggleButton.textContent = '收起';
+                    toggleButton.onclick = () => {
+                        currentCount = 10; // 重置为只显示前10条评论
+                        displayComments(); // 重新显示评论
+                    };
+                }
+
+                // 如果已经展开，添加收起按钮
+                if (currentCount >= 10 && currentCount < comments.length) {
+                    const collapseButton = document.createElement('button');
+                    collapseButton.id = 'collapseButton';
+                    collapseButton.textContent = '收起';
+                    collapseButton.onclick = () => {
+                        currentCount = 10; // 重置为只显示前10条评论
+                        displayComments(); // 重新显示评论
+                    };
+                    commentsContainer.appendChild(collapseButton);
+                }
+            }
+
+            // 调用 fetchComments 函数，传入电影 ID
+            fetchComments('{{ movie.id }}'); // 替换为实际的电影 ID
         </script>
     </div>
 

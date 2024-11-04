@@ -87,6 +87,13 @@ class Relationships(db.Model):
     role = db.Column(db.String(100))
     id = db.Column(db.Integer, primary_key=True)
 
+class Comment(db.Model):
+    __tablename__ = 'comment'
+
+    username = db.Column(db.String(100))
+    movieid = db.Column(db.Integer)
+    comment = db.Column(db.Text)
+    id = db.Column(db.Integer, primary_key=True)
 
 # 创建数据库表
 with app.app_context():
@@ -407,7 +414,30 @@ def require_movie_relationship(movie_id):
 
     return jsonify(result)
 
+@app.route('/require/movie_comments/<int:movie_id>')
+def require_movie_comments(movie_id):
+    """返回 JSON，指定电影的所有评论"""
+    logger.debug(f"Query movie {movie_id} comments")
 
+    movie = Movie.query.get(movie_id)
+    if not movie:
+        return jsonify({'error': 'Movie not found'}), 404
+
+    # 查询与电影相关的评论
+    comments = Comment.query.filter_by(movieid=movie_id).all()
+    logger.debug(f"Total comments found: {len(comments)}")
+
+    # 构建返回的数据结构
+    result = []
+    for comment in comments:
+        result.append({
+            'username': comment.username,
+            'comment': comment.comment,
+        })
+
+    # 打印调试信息以检查结果
+    # logger.debug(f"Comments: {result}")
+    return jsonify(result)
 
 @app.route('/people_relationship/<int:people_id>')
 def people_relationship(people_id):
