@@ -313,7 +313,7 @@
             }
 
             button {
-                padding: 10px 15px;
+                padding: 7px 15px;
                 /* 按钮内边距 */
                 border: none;
                 /* 去除边框 */
@@ -344,9 +344,16 @@
 
         <div id="movieCommentsContainer">
             <h2>电影评论</h2>
-            <div id="movieComments" class="scrollable-comments">
+            <div id="movieCommentsShow">
+                <div id="movieComments" class="scrollable-comments">
+                </div>
+                <button id="toggleButton">展开更多</button>
             </div>
-            <button id="toggleButton">展开更多</button>
+            
+            <!-- TODO 更新数据库 -->
+            <h3>添加评论</h3>
+            <textarea id="commentInput" placeholder="请输入您的评论..." rows="4" style="width: 100%;"></textarea>
+            <button id="submitComment">提交评论</button>
         </div>
 
         <script>
@@ -403,7 +410,7 @@
 
             // 更新按钮文本和功能
             function updateToggleButton() {
-                const commentsContainer = document.getElementById('movieCommentsContainer');
+                const commentsContainer = document.getElementById('movieCommentsShow');
                 const toggleButton = document.getElementById('toggleButton');
 
                 // 移除已有的收起按钮
