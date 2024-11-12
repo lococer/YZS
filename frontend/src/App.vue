@@ -1,3 +1,15 @@
+
+
+<template>
+  <div id="app">
+    <router-link to="/login">登录</router-link> |
+    <router-link to="/">Home</router-link> |
+    <router-link to="/movies">电影</router-link> |
+    <router-link to="/persons">演员</router-link>
+    <router-view />
+  </div>
+</template>
+
 <script>
 // TODO 设置导航
 // import { h, ref } from 'vue';
@@ -17,19 +29,14 @@
 //     title: 'Navigation Two',
 //   },
 // ]);
+import axios from 'axios';
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 export default {
-  name: 'App'
+  name: 'App',
 };
-</script>
 
-<template>
-  <div id="app">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/movies">电影</router-link> |
-    <router-link to="/persons">演员</router-link>
-    <router-view />
-  </div>
-</template>
+</script>
 
 <style>
 </style>

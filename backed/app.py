@@ -1,5 +1,5 @@
 from itertools import combinations
-from flask import Flask, abort, render_template, request, send_file, jsonify
+from flask import Flask, abort, render_template, request, send_file, jsonify, session
 import requests
 from io import BytesIO
 import base64
@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker, relationship
 import re
 from urllib.parse import urlencode
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # 配置文件日志处理器
 file_handler = logging.FileHandler('app.log')  # 指定日志文件
@@ -25,6 +26,7 @@ logger.addHandler(file_handler)  # 添加文件处理器
 
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # 设置一个唯一的密钥
 CORS(app)
 
 # 注册 max 和 min 函数
@@ -40,14 +42,14 @@ if( getpass.getuser() != 'lococ' ):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:leo@localhost:5432/postgres'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lococ:lococ@localhost:5432/mydatabase'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://lococ:lococ@172.21.231.150:5432/mydatabase'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 # 创建连接引擎和会话
 engine = create_engine('postgresql://postgres:leo@localhost:5432/postgres')
 Session = sessionmaker(bind=engine)
-session = Session()
+db_session = Session()
 
 # 创建数据库实例
 db = SQLAlchemy(app)
@@ -121,9 +123,82 @@ class Comment(db.Model):
     comment = db.Column(db.Text)
     id = db.Column(db.Integer, primary_key=True)
 
+# 用户模型
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'password': self.password
+        }
+
 # 创建数据库表
 with app.app_context():
     db.create_all()
+
+# 检查是否已登录
+@app.route('/api/check_login', methods=['GET'])
+def check_login():
+    if 'user_id' in session:
+        return jsonify({'logged_in': True}), 200
+    else:
+        return jsonify({'logged_in': False}), 200
+
+# 登出
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)  # 删除会话中的用户信息
+    return jsonify({'message': 'Logged out successfully.'}), 200
+
+# 注册
+@app.route('/api/register', methods=['POST'])
+def register():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    
+    # 输入验证
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required.'}), 400
+
+    # 检查用户名是否存在
+    if User.query.filter_by(username=username).first():
+        return jsonify({'error': 'Username already exists.'}), 409
+
+    # 创建新用户并哈希密码
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+    new_user = User(username=username, password=hashed_password)
+    
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        logger.exception("Database commit failed during registration.")
+        return jsonify({'error': 'Database error occurred.'}), 500
+
+    return jsonify({'message': 'User created successfully.'}), 201
+
+# 登录
+@app.route('/api/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    # 输入验证
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required.'}), 400
+
+    # 查找用户
+    user = User.query.filter_by(username=username).first()
+    if user and check_password_hash(user.password, password):
+        session['user_id'] = user.id  # 设置会话
+        return jsonify({'message': 'Login successful.'}), 200
+    else:
+        return jsonify({'error': 'Invalid username or password.'}), 401
 
 @app.route('/test')
 def test():
@@ -214,7 +289,7 @@ def get_persons():
     all_persons = all_persons[0:20]
     for person in all_persons:
         person.img = encode_image_url(person.img)
-    logger.debug(all_persons)
+    # logger.debug(all_persons)
     return jsonify([person.serialize() for person in all_persons])
 
 @app.route('/api/persons/<int:person_id>', methods=['GET'])
