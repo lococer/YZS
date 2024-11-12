@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
-            :page-size="pageSize" @change="onShowSizeChange">
+            :page-size="pageSize" @change="onPaginationChange">
             <template slot="buildOptionText" slot-scope="props">
                 <span>{{ props.value }}条/页</span>
             </template>
@@ -55,7 +55,7 @@ export default {
         fetchImage(imageUrl) {
             return `http://127.0.0.1:5001/proxy-image/${imageUrl}`;
         },
-        onShowSizeChange(current, pageSize) {
+        onPaginationChange(current, pageSize) {
             this.current = current;
             this.pageSize = pageSize;
             this.fetchMovies(current, pageSize);

@@ -1,6 +1,12 @@
 <template>
     <div>
-        <h2>演员列表</h2>
+        <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
+            :page-size="pageSize" @change="onPaginationChange">
+            <template slot="buildOptionText" slot-scope="props">
+                <span>{{ props.value }}条/页</span>
+            </template>
+        </a-pagination>
+        <h2>演员列表{{ current }}</h2>
         <div class="person-list">
             <a-row :gutter="16">
                 <a-col :span="6" v-for="person in persons" :key="person.id">
@@ -20,19 +26,23 @@
 
 <script>
 import axios from 'axios';
-import { Card, Row, Col } from 'ant-design-vue';  // 导入需要的组件
+import { Card, Row, Col, Pagination } from 'ant-design-vue';  // 导入需要的组件
 
 export default {
     components: { 'a-card': Card, 'a-row': Row, 'a-col': Col },
     data() {
         return {
-            persons: []
+            persons: [],
+            total: 0,
+            current: 1,
+            pageSize: 10,
+            pageSizeOptions: [10, 20, 30, 40, 50],
         };
     },
     methods: {
-        async fetchPersons() {
+        async fetchPersons(page, pageSize) {
             try {
-                const response = await axios.get('http://127.0.0.1:5001/api/persons');
+                const response = await axios.get(`http://127.0.0.1:5001/api/persons?page=${page}&pageSize=${pageSize}`);
                 this.persons = response.data;
             } catch (error) {
                 console.error("Error fetching movies:", error);
@@ -44,9 +54,23 @@ export default {
         },
         fetchImage(imageUrl) {
             return `http://127.0.0.1:5001/proxy-image/${imageUrl}`;
+        },
+        onPaginationChange(current, pageSize) {
+            this.current = current;
+            this.pageSize = pageSize;
+            this.fetchPersons(current, pageSize);
+        },
+        async fetchTotal() {
+            try {
+                const response = await axios.get(`http://127.0.0.1:5001/api/persons/count`);
+                this.total = response.data.count;
+            } catch (error) {
+                console.error("Error fetching total:", error);
+            }
         }
     },
     mounted() {
+        this.fetchTotal();
         this.fetchPersons();
     }
 };

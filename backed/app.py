@@ -296,12 +296,24 @@ def movieinfo(movie_id):
 
 @app.route('/api/persons', methods=['GET'])
 def get_persons():
-    all_persons = Person.query.all()  # 从数据库获取所有人员信息
+    page = request.args.get('page', 1, type=int)
+    pageSize = request.args.get('pageSize', 10, type=int)
+    # 计算开始和结束的索引
+    offset = (page - 1) * pageSize
+    limit = offset + pageSize
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}")
+    # 从数据库获取分页后的人员数据
+    all_persons = Person.query.offset(offset).limit(pageSize).all()
     all_persons = all_persons[0:200]
     for person in all_persons:
         person.img = encode_image_url(person.img)
     # logger.debug(all_persons)
     return jsonify([person.serialize() for person in all_persons])
+
+@app.route('/api/persons/count')
+def get_person_count():
+    count = Person.query.count()
+    return jsonify({'count': count})
 
 @app.route('/api/persons/<int:person_id>', methods=['GET'])
 def personinfo(person_id):
