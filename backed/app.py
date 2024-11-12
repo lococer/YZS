@@ -94,6 +94,17 @@ class Person(db.Model):
     birthplace = db.Column(db.String(100))
     summary = db.Column(db.String(100))
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'img': self.img,
+            'sex': self.sex,
+            'birthday': self.birthday,
+            'birthplace': self.birthplace,
+            'summary': self.summary
+        }
+
 class Relationships(db.Model):
     __tablename__ = 'relationships'
 
@@ -196,6 +207,26 @@ def movieinfo(movie_id):
     logger.debug(movie)
 
     return render_template('movieinfo.html', movie=movie, actors=people)
+
+@app.route('/api/persons', methods=['GET'])
+def get_persons():
+    all_persons = Person.query.all()  # 从数据库获取所有人员信息
+    all_persons = all_persons[0:20]
+    for person in all_persons:
+        person.img = encode_image_url(person.img)
+    logger.debug(all_persons)
+    return jsonify([person.serialize() for person in all_persons])
+
+@app.route('/api/persons/<int:person_id>', methods=['GET'])
+def personinfo(person_id):
+    person = Person.query.get(person_id)
+    if not person:
+        return abort(404)  # 如果没有找到人员信息，返回404错误
+    
+    person.img = encode_image_url(person.img)
+
+    return jsonify(person.serialize())
+
 
 @app.route('/movies/search')
 def search_movies():
@@ -531,27 +562,27 @@ def search_people():
     return render_template('people.html', people=people, total_pages=total_pages, current_page=page, query=queries)
 
 
-@app.route('/people/<int:person_id>')
-def personinfo(person_id):
-    person = Person.query.get(person_id)
-    if not person:
-        return abort(404)  # 如果没有找到演员，返回404错误
+# @app.route('/people/<int:person_id>')
+# def personinfo(person_id):
+#     person = Person.query.get(person_id)
+#     if not person:
+#         return abort(404)  # 如果没有找到演员，返回404错误
 
-    person.img = encode_image_url(person.img)
+#     person.img = encode_image_url(person.img)
 
-    # 查询与该演员相关的所有电影
-    movies = (db.session.query(Movie)
-          .join(Relationships, Relationships.movie_id == Movie.id)
-          .filter(Relationships.person_id == person_id)
-          .all())
+#     # 查询与该演员相关的所有电影
+#     movies = (db.session.query(Movie)
+#           .join(Relationships, Relationships.movie_id == Movie.id)
+#           .filter(Relationships.person_id == person_id)
+#           .all())
 
-    for movie in movies:
-        movie.img = encode_image_url(movie.img)
-    # 日志记录
-    logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
-    logger.debug(f"Movies for {person.name}: {[movie.name for movie in movies]}")
+#     for movie in movies:
+#         movie.img = encode_image_url(movie.img)
+#     # 日志记录
+#     logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
+#     logger.debug(f"Movies for {person.name}: {[movie.name for movie in movies]}")
 
-    return render_template('personinfo.html', person=person, movies=movies)
+#     return render_template('personinfo.html', person=person, movies=movies)
 
 
 @app.route('/index')
