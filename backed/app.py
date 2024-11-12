@@ -257,12 +257,26 @@ def movies():
 def get_movies():
     page = request.args.get('page', 1, type=int)
     pageSize = request.args.get('pageSize', 10, type=int)
+    tags = request.args.getlist('tags')
     # 计算开始和结束的索引
     offset = (page - 1) * pageSize
     limit = offset + pageSize
-    logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}")
-    # 从数据库获取分页后的电影数据
-    all_movies = Movie.query.offset(offset).limit(pageSize).all()
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}, Tags: {tags}")
+
+    query = Movie.query
+
+    if tags:
+        # 处理标签列表以避免重复连接
+        tag_ids = set()
+        for tag in tags:
+            tag_ids.add(tag)
+
+        # 添加过滤条件：筛选 tags 字段包含 tag_ids 列表中的任一元素的记录
+        query = query.filter(Movie.tags.overlap(tag_ids))
+
+    # 执行查询
+    all_movies = query.offset(offset).limit(limit).all()
+
     for movie in all_movies:
         movie.img = encode_image_url(movie.img)
     return jsonify([movie.serialize() for movie in all_movies])

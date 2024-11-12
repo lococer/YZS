@@ -1,5 +1,17 @@
 <template>
     <div>
+        <a-row gutter="16">
+            <!-- 标签筛选部分 -->
+            <a-col :span="24">
+                <a-button-group>
+                    <a-button v-for="tag in movieTags" :key="tag" @click="filterMovies(tag)">
+                        {{ tag }}
+                    </a-button>
+                </a-button-group>
+            </a-col>
+        </a-row>
+    </div>
+    <div>
         <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
             :page-size="pageSize" @change="onPaginationChange">
             <template slot="buildOptionText" slot-scope="props">
@@ -37,12 +49,14 @@ export default {
             pageSize: 10, // 每页条数
             current: 1, // 当前页
             pageSizeOptions: ['10', '20', '30', '40', '50'], // 分页选项
+            movieTags: ['动作', '喜剧'], // 电影标签
         };
     },
     methods: {
-        async fetchMovies(page, pageSize) {
+        async fetchMovies(page, pageSize, tags = []) {
             try {
-                const response = await axios.get(`http://127.0.0.1:5001/api/movies?page=${page}&pageSize=${pageSize}`);
+                console.log("Fetching movies with page:", page, "pageSize:", pageSize, "tags:", tags);
+                const response = await axios.get(`http://127.0.0.1:5001/api/movies?page=${page}&pageSize=${pageSize}&tags=${tags.join(',')}`);
                 this.movies = response.data;
             } catch (error) {
                 console.error("Error fetching movies:", error);
@@ -67,11 +81,26 @@ export default {
             } catch (error) {
                 console.error("Error fetching total:", error);
             }
-        }
+        },
+        // 获取所有标签
+        async fetchTags() {
+            try {
+                // const response = await axios.get('http://127.0.0.1:5001/api/tags');
+                // tags.value = response.data;  // 假设后端返回所有电影标签
+                this.movieTags = ['动作', '喜剧', '爱情', '科幻', '动画', '悬疑', '惊悚', '恐怖', '犯罪', '同性'];
+            } catch (error) {
+                console.error('Error fetching tags:', error);
+            }
+        },
+
+        filterMovies(tag) {
+            this.fetchMovies(1, this.pageSize, [tag]);
+        },
     },
     mounted() {
         this.fetchTotal()
         this.fetchMovies(this.current, this.pageSize);
+        this.fetchTags();
     }
 };
 </script>
