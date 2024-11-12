@@ -528,6 +528,14 @@ def require_people_relationship(people_id):
 
     return coactors
 
+@app.route('/api/persons/relations/<int:people_id>')
+def api_people_relationship(people_id):
+    """返回json,指定演员合作过的演员,以及合作过的次数
+    """
+    coactors = find_coactors(person_id=people_id)
+
+    return coactors
+
 @app.route('/require/movie_relationship/<int:movie_id>')
 def require_movie_relationship(movie_id):
     """返回 JSON，指定电影的所有演员和导演"""
