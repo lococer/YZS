@@ -1,6 +1,12 @@
 <template>
     <div>
-        <h2>电影列表</h2>
+        <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
+            :page-size="pageSize" @change="onShowSizeChange">
+            <template slot="buildOptionText" slot-scope="props">
+                <span>{{ props.value }}条/页</span>
+            </template>
+        </a-pagination>
+        <h2>电影列表{{ current }}</h2>
         <div class="movie-list">
             <a-row :gutter="16">
                 <a-col :span="6" v-for="movie in movies" :key="movie.id">
@@ -14,26 +20,29 @@
                 </a-col>
             </a-row>
         </div>
-
     </div>
 
 </template>
 
 <script>
 import axios from 'axios';
-import { Card, Row, Col } from 'ant-design-vue';  // 导入需要的组件
+import { Card, Row, Col, Pagination } from 'ant-design-vue';  // 导入需要的组件
 
 export default {
     components: { 'a-card': Card, 'a-row': Row, 'a-col': Col },
     data() {
         return {
-            movies: []
+            movies: [],
+            total: 200, // 总条数
+            pageSize: 10, // 每页条数
+            current: 1, // 当前页
+            pageSizeOptions: ['10', '20', '30', '40', '50'], // 分页选项
         };
     },
     methods: {
-        async fetchMovies() {
+        async fetchMovies(page, pageSize) {
             try {
-                const response = await axios.get('http://127.0.0.1:5001/api/movies');
+                const response = await axios.get(`http://127.0.0.1:5001/api/movies?page=${page}&pageSize=${pageSize}`);
                 this.movies = response.data;
             } catch (error) {
                 console.error("Error fetching movies:", error);
@@ -45,10 +54,24 @@ export default {
         },
         fetchImage(imageUrl) {
             return `http://127.0.0.1:5001/proxy-image/${imageUrl}`;
+        },
+        onShowSizeChange(current, pageSize) {
+            this.current = current;
+            this.pageSize = pageSize;
+            this.fetchMovies(current, pageSize);
+        },
+        async fetchTotal() {
+            try {
+                const response = await axios.get(`http://127.0.0.1:5001/api/movies/count`);
+                this.total = response.data.count;
+            } catch (error) {
+                console.error("Error fetching total:", error);
+            }
         }
     },
     mounted() {
-        this.fetchMovies();
+        this.fetchTotal()
+        this.fetchMovies(this.current, this.pageSize);
     }
 };
 </script>

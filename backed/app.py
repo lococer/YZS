@@ -255,11 +255,22 @@ def movies():
 # 示例 API 路由
 @app.route('/api/movies', methods=['GET'])
 def get_movies():
-    all_movies = Movie.query.all()  # 从数据库获取所有电影 
+    page = request.args.get('page', 1, type=int)
+    pageSize = request.args.get('pageSize', 10, type=int)
+    # 计算开始和结束的索引
+    offset = (page - 1) * pageSize
+    limit = offset + pageSize
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}")
+    # 从数据库获取分页后的电影数据
+    all_movies = Movie.query.offset(offset).limit(pageSize).all()
     for movie in all_movies:
         movie.img = encode_image_url(movie.img)
-    all_movies = all_movies[0:20]
     return jsonify([movie.serialize() for movie in all_movies])
+
+@app.route('/api/movies/count')
+def get_movie_count():
+    count = Movie.query.count()
+    return jsonify({'count': count})
 
 @app.route('/api/movies/<int:movie_id>', methods=['GET'])
 def movieinfo(movie_id):
@@ -286,7 +297,7 @@ def movieinfo(movie_id):
 @app.route('/api/persons', methods=['GET'])
 def get_persons():
     all_persons = Person.query.all()  # 从数据库获取所有人员信息
-    all_persons = all_persons[0:20]
+    all_persons = all_persons[0:200]
     for person in all_persons:
         person.img = encode_image_url(person.img)
     # logger.debug(all_persons)
