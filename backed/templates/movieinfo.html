@@ -221,6 +221,11 @@
             fetch('/require/movie_relationship/{{ movie.id }}')
                 .then(response => response.json())  // 解析JSON
                 .then(data => {
+                    console.log(data.actors.map(actor => ({
+                        name: actor.name,
+                        value: actor.value,
+                    })))
+
                     var option = {
                         title: {
                             text: '演员关系图'

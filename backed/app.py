@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import re
 from urllib.parse import urlencode
+from flask_cors import CORS
 
 # 配置文件日志处理器
 file_handler = logging.FileHandler('app.log')  # 指定日志文件
@@ -24,6 +25,7 @@ logger.addHandler(file_handler)  # 添加文件处理器
 
 
 app = Flask(__name__)
+CORS(app)
 
 # 注册 max 和 min 函数
 app.jinja_env.globals.update({
@@ -67,6 +69,19 @@ class Movie(db.Model):
 
     def __repr__(self):
         return f'<Movie {self.name}>'
+    
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'year': self.year,
+            'rating': self.rating,
+            'ratingsum': self.ratingsum,
+            'img': self.img,
+            'tags': self.tags,
+           'summary': self.summary,
+            'genre': self.genre
+        }
     
 class Person(db.Model):
     __tablename__ = 'person'
@@ -149,6 +164,38 @@ def movies():
     logger.debug(f"First movie: {movies[0].name if movies else 'No movies found'}")
 
     return render_template("movies.html", movies=movies, total_pages=total_pages, current_page=page)
+    # return jsonify(movies=[movie.serialize() for movie in movies])
+
+# 示例 API 路由
+@app.route('/api/movies', methods=['GET'])
+def get_movies():
+    all_movies = Movie.query.all()  # 从数据库获取所有电影 
+    for movie in all_movies:
+        movie.img = encode_image_url(movie.img)
+    all_movies = all_movies[0:20]
+    return jsonify([movie.serialize() for movie in all_movies])
+
+@app.route('/api/movies/<int:movie_id>', methods=['GET'])
+def movieinfo(movie_id):
+    movie = Movie.query.get(movie_id)
+    if not movie:
+        return abort(404)  # 如果没有找到电影，返回404错误
+    
+    movie.img = encode_image_url(movie.img)
+
+    return jsonify(movie.serialize())
+
+    people = get_people_by_movie_id(movie_id)
+
+    for person in people:
+        person.img = encode_image_url(person.img)
+        logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
+    
+    movie.directorName = get_people_by_movie_id(movie_id, role="director")[0].name if get_people_by_movie_id(movie_id, role="director") else None
+
+    logger.debug(movie)
+
+    return render_template('movieinfo.html', movie=movie, actors=people)
 
 @app.route('/movies/search')
 def search_movies():
@@ -228,25 +275,25 @@ def get_people_by_movie_id(movie_id, role=None):
 
     return query.all()
 
-@app.route('/movies/<int:movie_id>')
-def movieinfo(movie_id):
-    movie = Movie.query.get(movie_id)
-    if not movie:
-        return abort(404)  # 如果没有找到电影，返回404错误
+# @app.route('/movies/<int:movie_id>')
+# def movieinfo(movie_id):
+#     movie = Movie.query.get(movie_id)
+#     if not movie:
+#         return abort(404)  # 如果没有找到电影，返回404错误
     
-    movie.img = encode_image_url(movie.img)
+#     movie.img = encode_image_url(movie.img)
 
-    people = get_people_by_movie_id(movie_id)
+#     people = get_people_by_movie_id(movie_id)
 
-    for person in people:
-        person.img = encode_image_url(person.img)
-        logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
+#     for person in people:
+#         person.img = encode_image_url(person.img)
+#         logger.debug(f"Actor ID: {person.id}, Name: {person.name}")
     
-    movie.directorName = get_people_by_movie_id(movie_id, role="director")[0].name if get_people_by_movie_id(movie_id, role="director") else None
+#     movie.directorName = get_people_by_movie_id(movie_id, role="director")[0].name if get_people_by_movie_id(movie_id, role="director") else None
 
-    logger.debug(movie)
+#     logger.debug(movie)
 
-    return render_template('movieinfo.html', movie=movie, actors=people)
+#     return render_template('movieinfo.html', movie=movie, actors=people)
 
 @app.route('/people')
 def people():

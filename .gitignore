@@ -1,1 +1,23 @@
+# Node.js dependencies
+/node_modules
+/dist
+
+# Vue CLI and Vite generated files
+.vite
+.vscode
+.env.local
+
+# Python virtual environment
+/venv
+
+# Python compiled files
+*.pyc
+__pycache__/
+
+# Flask configuration
+instance/
+*.env
+*.py[cod]
+
+#logs
 app.log
