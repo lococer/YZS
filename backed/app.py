@@ -124,6 +124,14 @@ class Comment(db.Model):
     comment = db.Column(db.Text)
     id = db.Column(db.Integer, primary_key=True)
 
+    def serialize(self):
+        return {
+            'username': self.username,
+            'movieid': self.movieid,
+            'comment': self.comment,
+            'id': self.id
+        }
+
 # 用户模型
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -335,6 +343,50 @@ def get_movie_actors(movie_id):
         actor.img = encode_image_url(actor.img)
 
     return jsonify([actor.serialize() for actor in actors])
+
+@app.route('/api/movies/comments/<int:movie_id>')
+def get_movie_comments(movie_id):
+    logger.debug(f"Movie ID!: {movie_id}")
+    if not movie_id:
+        return jsonify({'error': 'Movie ID is required.'}), 400
+
+    # 获取电影的所有评论
+    comments = (
+        db.session.query(Comment)
+        .filter(Comment.movieid == movie_id)
+        .limit(10)
+        .all()
+    )
+    
+    result = jsonify([comment.serialize() for comment in comments])
+    logger.debug(result)
+    return result
+
+@app.route('/api/movies/addcomment', methods=['POST'])
+def add_movie_comment():
+
+    logger.debug("start add comment")
+
+    username = request.json.get('username')
+    movieid = request.json.get('movieid')
+    comment = request.json.get('comment')
+
+    logger.debug(f"Username: {username}, Movie ID: {movieid}, Comment: {comment}")
+
+    if not username or not movieid or not comment:
+        return jsonify({'error': 'Username, movieid and comment are required.'}), 400
+
+    new_comment = Comment(username=username, movieid=movieid, comment=comment)
+
+    try:
+        db.session.add(new_comment)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        logger.exception("Database commit failed during adding comment.")
+        return jsonify({'error': 'Database error occurred.'}), 500
+
+    return jsonify({'message': 'Comment added successfully.'}), 201
 
 @app.route('/api/persons', methods=['GET'])
 def get_persons():

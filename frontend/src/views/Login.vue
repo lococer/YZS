@@ -57,6 +57,7 @@ import axios from 'axios';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { notification } from 'ant-design-vue';
+import { useUserStore } from '../stores/user.js';
 
 export default {
   data() {
@@ -112,6 +113,10 @@ export default {
         console.log(response.data);
         // 例如，跳转到其他页面或存储用户信息
         localStorage.setItem('isLoggedIn', 'true');  // 登录后设置状态
+        const userStore = useUserStore();
+        userStore.setUserInfo( {name: this.form.username });
+        const userinfo = userStore.userInfo;
+        console.log(userinfo);
 
         // 跳转到首页
         this.$router.push('/');

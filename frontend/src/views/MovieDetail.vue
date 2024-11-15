@@ -50,6 +50,7 @@
       </a-layout-content>
 
     </a-layout>
+    <MyComment :movieId="movie.id" :currentUsername="currentUsername" />
   </div>
 </template>
 
@@ -57,6 +58,9 @@
 import axios from 'axios';
 import { Carousel } from 'ant-design-vue';
 import { LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons-vue';
+import MyComment from '../components/myComment.vue';
+import { useUserStore } from '../stores/user.js';
+
 
 export default {
   props: ['id'],
@@ -64,12 +68,14 @@ export default {
     return {
       movie: {},
       actors: {},
+      currentUsername: '',
     };
   },
   components: {
     'a-carousel': Carousel,
     LeftCircleOutlined,
-    RightCircleOutlined
+    RightCircleOutlined,
+    MyComment,
   },
   async created() {
     try {
@@ -77,10 +83,12 @@ export default {
       this.movie = response.data;
       response = await axios.get(`http://127.0.0.1:5001/api/movies/actors/${this.id}`);
       this.actors = response.data;
-      console.log(this.actors);
     } catch (error) {
       console.error("Error fetching movie details:", error);
     }
+    const userStore = useUserStore();
+    console.log(userStore.userInfo.name);
+    this.currentUsername = userStore.userInfo.name;
   },
   methods: {
     fetchImage(imageUrl) {
