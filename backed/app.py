@@ -13,6 +13,7 @@ import re
 from urllib.parse import urlencode
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.dialects.postgresql import array
 
 # 配置文件日志处理器
 file_handler = logging.FileHandler('app.log')  # 指定日志文件
@@ -269,10 +270,14 @@ def get_movies():
         # 处理标签列表以避免重复连接
         tag_ids = set()
         for tag in tags:
-            tag_ids.add(tag)
+            if( tag != '' ):
+                tag_ids.add(tag)
+
+        logger.debug(f"Tag IDs: {tag_ids}")
 
         # 添加过滤条件：筛选 tags 字段包含 tag_ids 列表中的任一元素的记录
-        query = query.filter(Movie.tags.overlap(tag_ids))
+        if len(tag_ids) > 0:
+            query = query.filter(Movie.tags.op("&&")(array(tag_ids)))
 
     # 执行查询
     all_movies = query.offset(offset).limit(limit).all()
