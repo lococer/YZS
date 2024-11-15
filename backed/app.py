@@ -284,7 +284,8 @@ def get_movies():
 
     for movie in all_movies:
         movie.img = encode_image_url(movie.img)
-    return jsonify([movie.serialize() for movie in all_movies])
+    resulut = {"movies": [movie.serialize() for movie in all_movies], "total": query.count()}
+    return jsonify(resulut)
 
 @app.route('/api/movies/count')
 def get_movie_count():
@@ -313,6 +314,28 @@ def movieinfo(movie_id):
 
     return render_template('movieinfo.html', movie=movie, actors=people)
 
+@app.route('/api/movies/actors/<int:movie_id>')
+def get_movie_actors(movie_id):
+    logger.debug(f"Movie ID: {movie_id}")
+    if not movie_id:
+        return jsonify({'error': 'Movie ID is required.'}), 400
+
+    # 获取电影的所有演员
+    actors = (
+        db.session.query(Person)
+        .select_from(Relationships)
+        .join(Person, Relationships.person_id == Person.id)
+        .filter(Relationships.movie_id == movie_id)
+        .filter(Relationships.role == 'actor')
+        .limit(10)
+        .all()
+    )
+
+    for actor in actors:
+        actor.img = encode_image_url(actor.img)
+
+    return jsonify([actor.serialize() for actor in actors])
+
 @app.route('/api/persons', methods=['GET'])
 def get_persons():
     page = request.args.get('page', 1, type=int)
@@ -328,6 +351,27 @@ def get_persons():
         person.img = encode_image_url(person.img)
     # logger.debug(all_persons)
     return jsonify([person.serialize() for person in all_persons])
+
+@app.route('/api/persons/movies/<int:person_id>')
+def get_person_movies(person_id):
+    logger.debug(f"Person ID: {person_id}")
+    if not person_id:
+        return jsonify({'error': 'Person ID is required.'}), 400
+
+    # 获取演员的所有电影
+    movies = (
+        db.session.query(Movie)
+        .select_from(Relationships)
+        .join(Movie, Relationships.movie_id == Movie.id)
+        .filter(Relationships.person_id == person_id)
+        .limit(10)
+        .all()
+    )
+
+    for movie in movies:
+        movie.img = encode_image_url(movie.img)
+
+    return jsonify([movie.serialize() for movie in movies])
 
 @app.route('/api/persons/count')
 def get_person_count():

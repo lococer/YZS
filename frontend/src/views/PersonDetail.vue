@@ -13,17 +13,43 @@
                         <a-card hoverable>
                             <img class="actor-img" :src="fetchImage(person.img)" alt="actor-image" />
                             <h2>{{ person.name }}</h2>
+                            <p><strong>性别:</strong>{{ person.sex }}</p>
                             <p><strong>生日:</strong>{{ person.birthday }}</p>
                             <p><strong>出生地:</strong>{{ person.birthplace }}</p>
+                        </a-card>
+                        <a-card title="" hoverable style="margin-top: 20px;">
+                            <a-collapse>
+                                <a-collapse-panel header="简介">
+                                    {{ person.summary }}
+                                </a-collapse-panel>
+                            </a-collapse>
+                            <!-- <p>{{ person.summary }}</p> -->
                         </a-card>
                     </a-col>
 
                     <!-- 右侧详细信息和作品列表 -->
                     <a-col :span="12">
-                        <a-card title="简介" hoverable>
-                            <p>{{ person.summary }}</p>
-                        </a-card>
-                        <a-card title="作品列表" hoverable>
+                        <a-card title="作品列表" hoverable >
+                            <a-carousel arrows>
+                                <template #prevArrow>
+                                    <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+                                        <left-circle-outlined />
+                                    </div>
+                                </template>
+                                <template #nextArrow>
+                                    <div class="custom-slick-arrow" style="right: 10px; z-index: 1">
+                                        <right-circle-outlined />
+                                    </div>
+                                </template>
+                                <div v-for="movie in movies" :key="movie.id">
+                                    <a-card :hoverable="true" @click="goToMovieDetail(movie.id)">
+                                        <a-card-meta :title="movie.name" :description="'Rating: ' + movie.rating" />
+                                        <template #cover>
+                                            <img :src="fetchImage(movie.img)" alt="cover" :title="movie.name"/>
+                                        </template>
+                                    </a-card>
+                                </div>
+                            </a-carousel>
                         </a-card>
                     </a-col>
                 </a-row>
@@ -43,6 +69,8 @@
 import axios from 'axios';
 import * as echarts from 'echarts';
 import { useRouter } from 'vue-router'; // 引入 vue-router
+import { Carousel } from 'ant-design-vue';
+import { LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons-vue';
 
 export default {
     props: ['id'],
@@ -50,13 +78,22 @@ export default {
         return {
             person: {},
             echartData: {},
+            movies: {},
         };
+    },
+    components: {
+        'a-carousel': Carousel,
+        LeftCircleOutlined,
+        RightCircleOutlined
     },
     async created() {
         try {
             // 请求人员数据
-            const response = await axios.get(`http://127.0.0.1:5001/api/persons/${this.id}`);
+            let response = await axios.get(`http://127.0.0.1:5001/api/persons/${this.id}`);
             this.person = response.data;
+            response = await axios.get(`http://127.0.0.1:5001/api/persons/movies/${this.id}`);
+            this.movies = response.data;
+            console.log(this.movies)
         } catch (error) {
             console.error("Error fetching person details:", error);
         }
@@ -149,11 +186,15 @@ export default {
             };
 
             myChart.on('click', function (params) {
-                if( params.dataType == 'node' ){
+                if (params.dataType == 'node') {
                     console.log(navigateToPerson)
                     navigateToPerson(params.data.url)
                 }
             })
+        },
+        goToMovieDetail(id) {
+            console.log("Going to movie detail for movie with id:", id);
+            this.$router.push({ name: 'MovieDetail', params: { id } });
         },
     },
     mounted() {
@@ -165,11 +206,13 @@ export default {
 
 <style scoped>
 .header {
-    color: white;
-    font-size: 24px;
-    text-align: center;
-    background-color: #1890ff;
-    padding: 16px;
+  background-color: #1890ff;
+  padding: 0 24px;
+  height: 64px;
+  line-height: 64px;
+  font-size: 20px;
+  color: white;
+  text-align: center;
 }
 
 .content {
@@ -181,5 +224,37 @@ export default {
     width: 100%;
     height: auto;
     border-radius: 8px;
+}
+
+:deep(.slick-slide) {
+    text-align: center;
+    height: 600px;
+    line-height: 160px;
+    background: #364d79;
+    overflow: hidden;
+}
+
+:deep(.slick-arrow.custom-slick-arrow) {
+    width: 25px;
+    height: 25px;
+    font-size: 25px;
+    color: #fff;
+    background-color: rgba(31, 45, 61, 0.11);
+    transition: ease all 0.3s;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+:deep(.slick-arrow.custom-slick-arrow:before) {
+    display: none;
+}
+
+:deep(.slick-arrow.custom-slick-arrow:hover) {
+    color: #fff;
+    opacity: 0.5;
+}
+
+:deep(.slick-slide h3) {
+    color: #fff;
 }
 </style>
