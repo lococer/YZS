@@ -5,6 +5,7 @@ import MovieDetail from '../views/MovieDetail.vue';
 import Persons from '../views/Persons.vue';
 import PersonDetail from '../views/PersonDetail.vue';
 import Login from '../views/Login.vue';
+// import store from '../store/store';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -26,7 +27,7 @@ router.beforeEach((to, from, next) => {
 
   if (to.name !== 'Login' && !isLoggedIn) {
     // 如果未登录且试图访问非登录页面，跳转到登录页面
-    next({ name: 'Login' });
+    next({ path: 'Login' });
   } else {
     next(); // 否则放行
   }
