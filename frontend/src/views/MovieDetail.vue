@@ -97,7 +97,12 @@ export default {
     goToActorDetail(actorId) {
       this.$router.push({ name: 'PersonDetail', params: { id: actorId } });
     }
-  }
+  },
+  onMounted() {
+  },
+  updated() {
+
+  },
 };
 </script>
 

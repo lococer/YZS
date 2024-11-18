@@ -2,17 +2,16 @@ import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {
     state: () => ({
-        userInfo: null, // 保存用户信息
+        userInfo: JSON.parse(localStorage.getItem('userInfo')) || {}  // 初始值从 localStorage 获取
     }),
     actions: {
-        setUserInfo(info) {
-            this.userInfo = info;
+        setUserInfo(userInfo) {
+            this.userInfo = userInfo;
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));  // 更新时持久化到 localStorage
         },
         clearUserInfo() {
-            this.userInfo = null;
-        },
-    },
-    getters: {
-        isLoggedIn: (state) => !!state.userInfo,
-    },
+            this.userInfo = {};
+            localStorage.removeItem('userInfo');
+        }
+    }
 });
