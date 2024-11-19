@@ -71,10 +71,10 @@ export default {
     const directors = ref([]);
     const screenwriters = ref([]);
     const actors = ref([]);
-    const selectedDirector = ref(null);
-    const selectedScreenwriter = ref(null);
-    const selectedActor1 = ref(null);
-    const selectedActor2 = ref(null);
+    const selectedDirector = ref([]);
+    const selectedScreenwriter = ref([]);
+    const selectedActor1 = ref([]);
+    const selectedActor2 = ref([]);
     const predictedRating = ref(null);
 
     // const options = [...Array(25)].map((_, i) => ({
@@ -140,19 +140,23 @@ export default {
 
     const predictRating = async () => {
       // 获取选择的id
-      const directorId = selectedDirector.value;
-      const screenwriterId = selectedScreenwriter.value;
-      const actor1Id = selectedActor1.value;
-      const actor2Id = selectedActor2.value;
+      const directorName = selectedDirector.value;
+      const screenwriterName = selectedScreenwriter.value;
+      const actor1Name = selectedActor1.value;
+      const actor2Name = selectedActor2.value;
+
+      console.log('Predicting rating for:', directorName, screenwriterName, actor1Name, actor2Name);
 
       // 调用后端API获取评分，这里假设API为 http://127.0.0.1:5001/api/predict-rating
       // 并假设它接受导演、编剧和两个主演的id作为参数
       try {
-        const response = await axios.post('http://127.0.0.1:5001/api/predict-rating', {
-          directorId,
-          screenwriterId,
-          actor1Id,
-          actor2Id,
+        const response = await axios.get('http://127.0.0.1:5001/api/predict-rating', {
+          params:{
+            director: selectedDirector.value,
+            autor: selectedScreenwriter.value,
+            actor1: selectedActor1.value,
+            actor2: selectedActor2.value,
+          }
         });
         predictedRating.value = response.data; // 假设返回的评分在response.data中
       } catch (error) {

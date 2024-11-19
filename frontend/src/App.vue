@@ -86,6 +86,8 @@ export default {
           selectedKey.value = "movies";
         } else if (newPath.startsWith("/persons")) {
           selectedKey.value = "persons";
+        } else if(newPath.startsWith("/predict")){
+          selectedKey.value = "predict";
         } else {
           selectedKey.value = "";
         }

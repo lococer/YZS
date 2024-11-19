@@ -239,6 +239,37 @@ def paginate_items(items, page, items_per_page=20):
     
     return paginated_items, total_pages
 
+@app.route('/api/predict-rating', methods=['GET'])
+def predict_rating():
+
+    directorName = request.args.getlist('director[]')
+    autorName = request.args.getlist('autor[]')
+    actor1Name = request.args.getlist('actor1[]')
+    actor2Name = request.args.getlist('actor2[]')
+
+    directorName = directorName[0]
+    autorName = autorName[0]
+    actor1Name = actor1Name[0]
+    actor2Name = actor2Name[0]
+
+    logger.debug(f"directorName: {directorName}, autorName: {autorName}, actor1Name: {actor1Name}, actor2Name: {actor2Name}")
+
+    directorId = Person.query.filter_by(name=directorName).first().id
+    logger.debug(f"directorId: {directorId}")
+    autorId = Person.query.filter_by(name=autorName).first().id
+    logger.debug(f"autorId: {autorId}")
+    actor1Id = Person.query.filter_by(name=actor1Name).first().id
+    logger.debug(f"actor1Id: {actor1Id}")
+    actor2Id = Person.query.filter_by(name=actor2Name).first().id
+    logger.debug(f"actor2Id: {actor2Id}")
+
+    logger.debug(f"directorId: {directorId}, autorId: {autorId}, actor1Id: {actor1Id}, actor2Id: {actor2Id}")
+
+    def predict():
+        return 8.5
+
+    return jsonify({'rating': predict()})
+
 @app.route('/api/persons/directors')
 def get_directors():
     logger.debug("Get directors")
@@ -275,13 +306,11 @@ def get_actors():
 @app.route('/api/persons/authors')
 def get_auther():
     auther = (
-        db.session.query(Movie)
-        .filter(Movie.id.in_(db.session.query(Relationships.movie_id).filter(Relationships.role == 'author')))
+        db.session.query(Person)
+        .filter(Person.id.in_(db.session.query(Relationships.person_id).filter(Relationships.role == 'author')))
+        .limit(10)
         .all()
     )
-
-    for movie in auther:
-        movie.img = encode_image_url(movie.img)
 
     return jsonify([movie.serialize() for movie in auther])
 
