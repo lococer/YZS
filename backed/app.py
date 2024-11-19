@@ -267,12 +267,39 @@ def get_movies():
     page = request.args.get('page', 1, type=int)
     pageSize = request.args.get('pageSize', 10, type=int)
     tags = request.args.getlist('tags')
+    actors = request.args.getlist('actors')
+    logger.debug(f"actors: {actors}")
+    # actors 逗号分隔
+    actors = [actor.strip() for actor in actors]
+
     # 计算开始和结束的索引
     offset = (page - 1) * pageSize
-    limit = offset + pageSize
+    limit = pageSize
     logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}, Tags: {tags}")
+    logger.debug(f"Actors: {actors}")
 
     query = Movie.query
+
+    if actors:
+
+        # 先将actors从name转换成id
+        actors = [Person.query.filter_by(name=actor).first().id for actor in actors]
+
+        logger.debug(f"Actors ID: {actors}")
+
+        # 获取所有演员的电影 ID 的交集
+        actor_movies_subqueries = [
+            db.session.query(Relationships.movie_id).filter(Relationships.person_id == actor)
+            for actor in actors
+        ]
+    
+        if actor_movies_subqueries:
+            # 使用交集来筛选共同的电影
+            common_movie_ids = actor_movies_subqueries[0]
+            for subquery in actor_movies_subqueries[1:]:
+                common_movie_ids = common_movie_ids.intersect(subquery)
+        
+        query = query.filter(Movie.id.in_(common_movie_ids))
 
     if tags:
         # 处理标签列表以避免重复连接
@@ -404,6 +431,16 @@ def get_persons():
     # logger.debug(all_persons)
     return jsonify([person.serialize() for person in all_persons])
 
+@app.route('/api/allPersons', methods=['GET'])
+def get_all_persons():
+    all_persons = Person.query.all()
+    for person in all_persons:
+        person.img = encode_image_url(person.img)
+    logger.debug("fetch all persons")
+    result = jsonify([person.serialize() for person in all_persons])
+    logger.debug(all_persons.__len__())
+    return result
+
 @app.route('/api/persons/movies/<int:person_id>')
 def get_person_movies(person_id):
     logger.debug(f"Person ID: {person_id}")
@@ -429,6 +466,15 @@ def get_person_movies(person_id):
 def get_person_count():
     count = Person.query.count()
     return jsonify({'count': count})
+
+@app.route('/api/person/<int:person_id>')
+def get_person_info(person_id):
+    person = Person.query.get(person_id)
+    if not person:
+        return abort(404)  # 如果没有找到人员信息，返回404错误
+    
+    person.img = encode_image_url(person.img)
+    return jsonify(person.serialize())
 
 @app.route('/api/persons/<int:person_id>', methods=['GET'])
 def personinfo(person_id):
@@ -646,7 +692,9 @@ def find_coactors(person_id):
                     "common_movie_ids": common_movie_ids,
                     "value": len(common_movie_ids),  # 可以选择更有意义的值
                     # "common_movies": [Movie.query.get(movie_id) for movie_id in common_movie_ids]
-                    "url": create_search_url("", ["actorName", "actorName"], [actor1_name, actor2_name]),
+                    # "url": create_search_url("", ["actorName", "actorName"], [actor1_name, actor2_name]),
+                    "url": f"{actor1_id}-{actor2_id}",
+                    # "url": f"{actor1_name}-{actor2_name}",
                 })
 
         result["links"] = relationships

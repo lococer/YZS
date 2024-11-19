@@ -128,8 +128,8 @@ export default {
             // 获取图表容器
             const chartContainer = this.$refs.chartContainer;
 
-            console.log(this.echartData);
-            console.log(this.echartData.actors)
+            // console.log(this.echartData);
+            // console.log(this.echartData.actors)
 
             // 初始化 ECharts 实例
             const myChart = echarts.init(chartContainer);
@@ -155,7 +155,8 @@ export default {
                             source: link.source,
                             target: link.target,
                             value: link.value,
-                            url: link.url
+                            // url: `${link.source}-${link.target}`,
+                            url: link.url,
                         })),
                         roam: true,  // 允许拖拽
                         draggable: true,
@@ -185,10 +186,26 @@ export default {
                 window.location.href = `/persons/${url}`;
             };
 
+            // 添加 navigateToMovies 方法
+            const navigateToMovies = (actorId1, actorId2) => {
+                // 构建查询对象
+                const query = {
+                    actor1: actorId1,
+                    actor2: actorId2,
+                };
+                // 使用 this.$router.push 进行导航，并传递查询参数
+                console.log(query);
+                this.$router.push({ name: 'Movies', query });
+            };
+
             myChart.on('click', function (params) {
                 if (params.dataType == 'node') {
                     console.log(navigateToPerson)
                     navigateToPerson(params.data.url)
+                }
+                if (params.dataType == 'edge'){
+                    const actorIds = params.data.url.split('-');
+                    navigateToMovies(actorIds[0], actorIds[1]);
                 }
             })
         },
