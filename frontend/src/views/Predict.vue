@@ -2,34 +2,50 @@
   <a-form layout="vertical">
     <a-form-item label="导演">
       <a-select
-        show-search
+        mode="tags"
+        style="width: 100%"
+        :max-tag-count="1"
+        :max-tag-text="() => '最多只能选择一个'"
         placeholder="选择导演"
         :options="directors"
-        v-model="selectedDirector"
+        v-model:value="selectedDirector"
+        @change="handleDirectorChange"
       ></a-select>
     </a-form-item>
     <a-form-item label="编剧">
       <a-select
-        show-search
+        mode="tags"
+        style="width: 100%"
+        :max-tag-count="1"
+        :max-tag-text="() => '最多只能选择一个'"
         placeholder="选择编剧"
         :options="screenwriters"
-        v-model="selectedScreenwriter"
+        v-model:value="selectedScreenwriter"
+        @change="handleScreenwriterChange"
       ></a-select>
     </a-form-item>
     <a-form-item label="主演1">
       <a-select
-        show-search
+        mode="tags"
+        style="width: 100%"
+        :max-tag-count="1"
+        :max-tag-text="() => '最多只能选择一个'"
         placeholder="选择主演1"
         :options="actors"
-        v-model="selectedActor1"
+        v-model:value="selectedActor1"
+        @change="handleActor1Change"
       ></a-select>
     </a-form-item>
     <a-form-item label="主演2">
       <a-select
-        show-search
+        mode="tags"
+        style="width: 100%"
+        :max-tag-count="1"
+        :max-tag-text="() => '最多只能选择一个'"
         placeholder="选择主演2"
         :options="actors"
-        v-model="selectedActor2"
+        v-model:value="selectedActor2"
+        @change="handleActor2Change"
       ></a-select>
     </a-form-item>
     <a-button type="primary" @click="predictRating">推测评分</a-button>
@@ -40,7 +56,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { Select, Form } from 'ant-design-vue';
 import axios from 'axios';
 
@@ -61,24 +77,99 @@ export default {
     const selectedActor2 = ref(null);
     const predictedRating = ref(null);
 
-    const fetchOptions = async () => {
-      const directorRes = await axios.get('http://127.0.0.1:5001/api/persons/directors');
-      // console.log(directorRes.data);
-      directors.value = directorRes.data.map(item => ({ value: item.id, label: item.name }));
+    // const options = [...Array(25)].map((_, i) => ({
+    //   value: (i + 10).toString(36) + (i + 1), label: `Option ${i + 1}`,
+    // }));
+    const options = [
+      { value: '1', label: 'Option 1' },
+      { value: '2', label: 'Option 2' },
+      { value: '3', label: 'Option 3' },
+      { value: '4', label: 'Option 4' },
+      { value: '13', label: 'Option 13' }
+    ];
 
-      const screenwriterRes = await axios.get('http://127.0.0.1:5001/api/persons/authors');
-      // console.log(screenwriterRes.data);
-      screenwriters.value = screenwriterRes.data.map(item => ({ value: item.id, label: item.name }));
-
-      const actorRes = await axios.get('http://127.0.0.1:5001/api/persons/actors');
-      // console.log(actorRes.data);
-      actors.value = actorRes.data.map(item => ({ value: item.id, label: item.name }));
+    const handleChange = value => {
+      console.log(`selected ${value}`);
     };
 
-    const predictRating = () => {
-      // 这里可以添加你的逻辑来根据选择的导演、编剧和演员来推测电影评分
-      // 例如，可以是一个简单的算法，或者调用后端API获取评分
-      predictedRating.value = '8.5'; // 假设的评分
+    // 处理导演变化
+    const handleDirectorChange = (value) => {
+      console.log('Selected director:', value);
+      selectedDirector.value = value;
+    };
+
+    // 监听selectedDirector变化，确保不超过一个选择
+    watch(selectedDirector, (newVal) => {
+      if (newVal.length > 1) {
+        selectedDirector.value = [newVal[0]]; // 只保留第一个选择
+      }
+    });
+
+    // 处理编剧变化
+    const handleScreenwriterChange = (value) => {
+      selectedScreenwriter.value = value;
+    };
+
+    watch(selectedScreenwriter, (newVal) => {
+      if (newVal.length > 1) {
+        selectedScreenwriter.value = [newVal[0]]; // 只保留第一个选择
+      }
+    });
+
+    // 处理主演1变化
+    const handleActor1Change = (value) => {
+      selectedActor1.value = value;
+    };
+
+    watch(selectedActor1, (newVal) => {
+      if (newVal.length > 1) {
+        selectedActor1.value = [newVal[0]]; // 只保留第一个选择
+      }
+    });
+
+    // 处理主演2变化
+    const handleActor2Change = (value) => {
+      selectedActor2.value = value;
+    };
+
+    watch(selectedActor2, (newVal) => {
+      if (newVal.length > 1) {
+        selectedActor2.value = [newVal[0]]; // 只保留第一个选择
+      }
+    });
+
+    const predictRating = async () => {
+      // 获取选择的id
+      const directorId = selectedDirector.value;
+      const screenwriterId = selectedScreenwriter.value;
+      const actor1Id = selectedActor1.value;
+      const actor2Id = selectedActor2.value;
+
+      // 调用后端API获取评分，这里假设API为 http://127.0.0.1:5001/api/predict-rating
+      // 并假设它接受导演、编剧和两个主演的id作为参数
+      try {
+        const response = await axios.post('http://127.0.0.1:5001/api/predict-rating', {
+          directorId,
+          screenwriterId,
+          actor1Id,
+          actor2Id,
+        });
+        predictedRating.value = response.data; // 假设返回的评分在response.data中
+      } catch (error) {
+        console.error('Error predicting rating:', error);
+        predictedRating.value = 'Failed to predict rating';
+      }
+    };
+
+    const fetchOptions = async () => {
+      const directorRes = await axios.get('http://127.0.0.1:5001/api/persons/directors');
+      directors.value = directorRes.data.map(item => ({ value: item.name, label: item.name }));
+
+      const screenwriterRes = await axios.get('http://127.0.0.1:5001/api/persons/authors');
+      screenwriters.value = screenwriterRes.data.map(item => ({ value: item.name, label: item.name }));
+
+      const actorRes = await axios.get('http://127.0.0.1:5001/api/persons/actors');
+      actors.value = actorRes.data.map(item => ({ value: item.name, label: item.name }));
     };
 
     onMounted(fetchOptions);
@@ -93,6 +184,12 @@ export default {
       selectedActor2,
       predictedRating,
       predictRating,
+      handleChange,
+      handleDirectorChange,
+      handleScreenwriterChange,
+      handleActor1Change,
+      handleActor2Change,
+      options,
     };
   },
 };

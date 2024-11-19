@@ -245,19 +245,25 @@ def get_directors():
     directors = (
         db.session.query(Person)
         .filter(Person.id.in_(db.session.query(Relationships.person_id).filter(Relationships.role == 'director')))
+        .limit(10)
         .all()
     )
 
     for director in directors:
         director.img = encode_image_url(director.img)
 
+    res = [ { "id": "1", "name": "Option 1" }, { "id": "2", "name": "Option 2" }, { "id": "3", "name": "Option 3" }, { "id": "4", "name": "Option 4" }, { "id": "13", "name": "Option 13" } ]
+
     return jsonify([director.serialize() for director in directors])
+    return jsonify(res)
+
 
 @app.route('/api/persons/actors')
 def get_actors():
     actors = (
         db.session.query(Person)
         .filter(Person.id.in_(db.session.query(Relationships.person_id).filter(Relationships.role == 'actor')))
+        .limit(10)
         .all()
     )
 

@@ -60,7 +60,7 @@ export default {
             pageSizeOptions: ['10', '20', '30', '40', '50'], // 分页选项
             movieTags: ['动作', '喜剧'], // 电影标签
             filterTag: [], // 当前筛选的标签
-            selectedActors: ['陆建艺 Jianyi Lu', '弗兰克·维尔克 Frank Welker'], // 用户选择的演员
+            selectedActors: [], // 用户选择的演员
             actors: [], // 所有演员列表
         };
     },
