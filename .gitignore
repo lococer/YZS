@@ -2,6 +2,8 @@
 /node_modules
 /dist
 
+/predict/csv
+
 # Vue CLI and Vite generated files
 .vite
 .vscode
