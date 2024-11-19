@@ -239,6 +239,46 @@ def paginate_items(items, page, items_per_page=20):
     
     return paginated_items, total_pages
 
+@app.route('/api/persons/directors')
+def get_directors():
+    logger.debug("Get directors")
+    directors = (
+        db.session.query(Person)
+        .filter(Person.id.in_(db.session.query(Relationships.person_id).filter(Relationships.role == 'director')))
+        .all()
+    )
+
+    for director in directors:
+        director.img = encode_image_url(director.img)
+
+    return jsonify([director.serialize() for director in directors])
+
+@app.route('/api/persons/actors')
+def get_actors():
+    actors = (
+        db.session.query(Person)
+        .filter(Person.id.in_(db.session.query(Relationships.person_id).filter(Relationships.role == 'actor')))
+        .all()
+    )
+
+    for actor in actors:
+        actor.img = encode_image_url(actor.img)
+
+    return jsonify([actor.serialize() for actor in actors])
+
+@app.route('/api/persons/authors')
+def get_auther():
+    auther = (
+        db.session.query(Movie)
+        .filter(Movie.id.in_(db.session.query(Relationships.movie_id).filter(Relationships.role == 'author')))
+        .all()
+    )
+
+    for movie in auther:
+        movie.img = encode_image_url(movie.img)
+
+    return jsonify([movie.serialize() for movie in auther])
+
 @app.route('/movies')
 def movies():
     # 获取所有电影
