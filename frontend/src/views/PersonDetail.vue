@@ -29,7 +29,7 @@
 
                     <!-- 右侧详细信息和作品列表 -->
                     <a-col :span="12">
-                        <a-card title="作品列表" hoverable >
+                        <a-card title="参与作品" hoverable >
                             <a-carousel arrows>
                                 <template #prevArrow>
                                     <div class="custom-slick-arrow" style="left: 10px; z-index: 1">

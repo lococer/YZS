@@ -6,7 +6,7 @@
                 <span>{{ props.value }}条/页</span>
             </template>
         </a-pagination>
-        <h2>演员列表{{ current }}</h2>
+        <h2>演员列表</h2>
         <div class="person-list">
             <a-row :gutter="16">
                 <a-col :span="6" v-for="person in persons" :key="person.id">

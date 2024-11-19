@@ -5,7 +5,7 @@ import MovieDetail from '../views/MovieDetail.vue';
 import Persons from '../views/Persons.vue';
 import PersonDetail from '../views/PersonDetail.vue';
 import Login from '../views/Login.vue';
-// import store from '../store/store';
+import Predict from '../views/Predict.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -14,6 +14,7 @@ const routes = [
   { path: '/persons', name: 'Persons', component: Persons },
   { path: '/persons/:id', name: 'PersonDetail', component: PersonDetail, props: true },
   { path: '/login', name: 'Login', component: Login },
+  { path: '/predict', name: 'Predict', component: Predict, props: true },
 ];
 
 

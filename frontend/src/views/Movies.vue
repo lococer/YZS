@@ -19,7 +19,7 @@
                 <span>{{ props.value }}条/页</span>
             </template>
         </a-pagination>
-        <h2>电影列表{{ current }}</h2>
+        <h2>电影列表</h2>
         <div class="movie-list">
             <a-row :gutter="16">
                 <a-col :span="6" v-for="movie in movies" :key="movie.id">

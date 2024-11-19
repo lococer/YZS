@@ -11,7 +11,17 @@
             <a-card hoverable>
               <img :src="fetchImage(movie.img)" alt="cover" />
               <h2>{{ movie.name }}</h2>
-              <p>Rating: {{ movie.rating }}</p>
+              <!-- <p>评分: {{ movie.rating }}</p>
+              <p>年份: {{ movie.year }}</p>
+              <p>类型: {{ movie.genre }}</p> -->
+              <a-descriptions >
+                <a-descriptions-item label="电影名"> {{ movie.name }} </a-descriptions-item>
+                <a-descriptions-item label="导演">  </a-descriptions-item>
+                <a-descriptions-item label="年份"> {{ movie.year }} </a-descriptions-item>
+                <a-descriptions-item label="评分"> {{ movie.rating }} </a-descriptions-item>
+                <a-descriptions-item label="类型"> {{ movie.genre }} </a-descriptions-item>
+                <a-descriptions-item lable="评分图">  </a-descriptions-item>
+              </a-descriptions>
             </a-card>
             <a-card hoverable style="margin-top: 20px;">
               <a-collapse>

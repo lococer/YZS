@@ -440,6 +440,29 @@ def personinfo(person_id):
 
     return jsonify(person.serialize())
 
+@app.route('/api/MoviesRatings', methods=['GET'])
+def get_movies_ratings():
+    try:
+        # 统计各评分区间的电影数量
+        ratings_distribution = {
+            "1分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 1).scalar(),
+            "2分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 2).scalar(),
+            "3分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 3).scalar(),
+            "4分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 4).scalar(),
+            "5分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 5).scalar(),
+            "6分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 6).scalar(),
+            "7分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 7).scalar(),
+            "8分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 8).scalar(),
+            "9分": db.session.query(func.count(Movie.id)).filter(Movie.rating == 9).scalar(),
+        }
+
+        # 格式化为前端需要的结构
+        response_data = { "ratings" : [{"name": key, "value": value} for key, value in ratings_distribution.items()]}
+        
+
+        return jsonify(response_data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/movies/search')
 def search_movies():

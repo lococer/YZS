@@ -63,7 +63,7 @@ export default {
   data() {
     return {
       form: {
-        username: '123',
+        username: '',
         password: '',
         confirmPassword: '',
       },
@@ -135,7 +135,7 @@ export default {
     switchForm() {
       this.isLogin = !this.isLogin;
       // 重置表单字段
-      this.form.username = '123';
+      this.form.username = '';
       this.form.password = '';
       this.form.confirmPassword = '';
     },

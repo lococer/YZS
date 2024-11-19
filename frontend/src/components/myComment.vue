@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>{{ movieId }}</div>
+    <!-- <div>{{ movieId }}</div> -->
     <div class="comment-component">
       <h3>评论列表</h3>
       <a-list>
@@ -19,7 +19,7 @@
       </a-list>
 
       <h4>发表评论</h4>
-      {{ currentUsername }}
+      <!-- {{ currentUsername }} -->
       <a-form @submit.prevent="submitComment">
         <a-textarea
           v-model:value="newComment.content"
