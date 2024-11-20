@@ -14,7 +14,7 @@
           :selectedKeys="[selectedKey]"
         >
           <a-menu-item key="login">
-            <router-link to="/login">登录</router-link>
+            <router-link to="/login">用户</router-link>
           </a-menu-item>
           <a-menu-item key="home">
             <router-link to="/">主页</router-link>
@@ -37,12 +37,10 @@
       </a-layout-content>
     </a-layout>
     </div>
-    <!-- <router-view /> -->
   </div>
 </template>
 
 <script>
-// TODO 设置导航
 import axios from 'axios';
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';

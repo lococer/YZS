@@ -7,6 +7,13 @@
      isLoggedIn:{{ isLoggedIn }}
      <a-alert v-if="isJustLoginOut" type="success" message="退出成功" show-icon /> -->
   </div>
+  <div v-if="isLoggedIn">
+    <a-card class="login-form">
+      <h2>当前用户：{{ currentUsername }}</h2>
+      <a-button @click="loginOut" style="margin-top: 16px">退出登录</a-button>
+    </a-card>
+  </div>
+  <div v-else>
 
   <a-card class="login-form">
     <h2>{{ isLogin ? '登录' : '注册' }}</h2>
@@ -48,8 +55,9 @@
         >{{ isLogin ? '登录' : '注册' }}</a-switch>
       </a-form-item>
     </a-form>
-    <a-button @click="loginOut" style="margin-top: 16px">退出登录</a-button>
   </a-card>
+
+  </div>
 </template>
 
 <script>
@@ -74,6 +82,7 @@ export default {
       isLoggedIn: computed(() => {
         return localStorage.getItem('isLoggedIn') === 'true';
       }),
+      currentUsername: '',
     };
   },
   setup(){
@@ -93,6 +102,9 @@ export default {
     if(this.$route.query.redirect){
       this.showLoginAlert = true;
     }
+    const userStore = useUserStore();
+    console.log(userStore.userInfo.name);
+    this.currentUsername = userStore.userInfo.name;
   },
   methods: {
     async handleSubmit() {
@@ -150,6 +162,8 @@ export default {
         this.isJustLoginOut = true;
         localStorage.removeItem('isLoggedIn');
         this.$router.push('/login');
+        // 刷新页面
+        window.location.reload();
         this.notifyUser('退出成功', '您已成功退出登录');
       }catch(error){
         console.error(error);
