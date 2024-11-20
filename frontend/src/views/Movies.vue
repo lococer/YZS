@@ -1,24 +1,46 @@
 <template>
     <div>
-        <h2>标签筛选</h2>
-        <a-row gutter="16">
-            <a-col :span="24">
-                <!-- 使用 Select 组件 -->
-                <a-select mode="multiple" allow-clear placeholder="请选择标签" style="width: 100%" @change="filterMovies">
-                    <a-select-option v-for="tag in movieTags" :key="tag" :value="tag">
-                        {{ tag }}
+        <div>
+            <h2>标签筛选</h2>
+            <a-row gutter="16">
+                <a-col :span="12">
+                    <!-- 使用 Select 组件 -->
+                    <a-select mode="multiple" allow-clear placeholder="选择标签" style="width: 100%"
+                        @change="filterMovies">
+                        <a-select-option v-for="tag in movieTags" :key="tag" :value="tag">
+                            {{ tag }}
+                        </a-select-option>
+                    </a-select>
+                </a-col>
+            </a-row>
+            <h2>国家筛选</h2>
+            <a-row gutter="16">
+                <a-col :span="12">
+                    <a-select mode="tags" allow-clear placeholder="选择国家" style="width: 100%" v-model:value="filterCountry"
+                    @change="filterMoviesCountry">
+                    <a-select-option v-for="country in movieCountry" :key="country" :value="country">
+                        {{ country }}
                     </a-select-option>
-                </a-select>
-            </a-col>
-        </a-row>
+                    </a-select>
+                </a-col>
+            </a-row>
+        </div>
         <div>
             <h2>年份筛选</h2>
-            <!-- 滑动输入条 -->
-            <a-slider v-model:value="yearRange" :min="minYear" :max="maxYear" :range="true"
-                onUpdate:value="handleYearChange" />
+            <a-row gutter="16">
+                <a-col :span="12">
+                    <!-- 滑动输入条 -->
+                    <a-slider v-model:value="yearRange" :min="minYear" :max="maxYear" :range="true"
+                    onUpdate:value="handleYearChange" />
+                </a-col>
+            </a-row>
             <h2>评分筛选</h2>
-            <a-slider v-model:value="ratingRange" :min="minRating" :max="maxRating" :range="true"
-                onUpdate:value="handleRatingChange" />
+            <a-row gutter="16">
+                <a-col :span="12">
+                    <a-slider v-model:value="ratingRange" :min="minRating" :max="maxRating" :range="true"
+                    onUpdate:value="handleRatingChange" />
+                </a-col>
+            </a-row>
         </div>
     </div>
     <div v-if="selectedActors.length > 0">
@@ -32,7 +54,7 @@
     <div>
         <a-button type="primary" @click="fetchMovies(1, pageSize)">筛选</a-button>
     </div>
-    <div v-if = "movies.length > 0">
+    <div v-if="movies.length > 0">
         <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
             :page-size="pageSize" @change="onPaginationChange">
             <template slot="buildOptionText" slot-scope="props">
@@ -54,7 +76,7 @@
         </div>
     </div>
     <div v-else>
-        <a-empty/>
+        <a-empty />
     </div>
 
 </template>
@@ -62,6 +84,7 @@
 <script>
 import axios from 'axios';
 import { Card, Row, Col, Pagination, Select } from 'ant-design-vue';  // 导入需要的组件
+import { watch } from 'vue';
 
 export default {
     components: { 'a-card': Card, 'a-row': Row, 'a-col': Col },
@@ -74,6 +97,8 @@ export default {
             pageSizeOptions: ['10', '20', '30', '40', '50'], // 分页选项
             movieTags: ['动作', '喜剧'], // 电影标签
             filterTag: [], // 当前筛选的标签
+            movieCountry: [],
+            filterCountry: [],
             selectedActors: [], // 用户选择的演员
             actors: [], // 所有演员列表
             minYear: 1900, // 最小年份
@@ -90,7 +115,7 @@ export default {
             const actors = this.selectedActors;
             const yearRange = this.yearRange;
             const ratingRange = this.ratingRange;
-            console.log("before this.selectedActors",this.selectedActors);
+            const country = this.filterCountry;
             try {
                 console.log("Fetching movies with page:", page, "pageSize:", pageSize, "tags:", tags, "actors:", actors);
                 // const response = await axios.get(`http://127.0.0.1:5001/api/movies?page=${page}&pageSize=${pageSize}&tags=${tags.join(',')}&actors=${actors.join(',')}`);
@@ -102,6 +127,7 @@ export default {
                         tags: tags.join(','),
                         yearRange: yearRange.join(','),
                         ratingRange: ratingRange.join(','),
+                        country: country.join(','),
                     },
                     paramsSerializer: (params) => {
                         // 自定义序列化逻辑，将 actors 数组转换为 `actors=actor1&actors=actor2`
@@ -153,6 +179,20 @@ export default {
                     '功夫', '武侠', '人物', '传记', '纪录',
                     '动画', '短片',
                 ]
+                this.movieCountry=[
+                    "不丹", "东德", "中国", "中国大陆", "丹麦", "乌克兰", "乌拉圭", "乍得", "亚美尼亚",
+                    "以色列", "伊朗", "俄罗斯", "保加利亚", "克罗地亚", "八一电影制片厂", "冰岛", "冰島Iceland",
+                    "刚果", "利比亚", "加拿大", "加拿大Canada", "加纳", "匈牙利", "南斯拉夫", "南斯拉夫联盟共和国",
+                    "南非", "卡塔尔", "卢森堡", "印度", "印度尼西亚", "原西德", "古巴", "台湾", "吉尔吉斯斯坦", "哈萨克斯坦",
+                    "哥伦比亚", "土耳其", "塔吉克斯坦", "塞尔维亚", "塞黑", "墨西哥", "奥地利", "委内瑞拉", "孟加拉国",
+                    "尼日尔", "巴西", "布基纳法索", "希腊", "德国", "意大利", "挪威", "捷克", "捷克斯洛伐克", "摩洛哥",
+                    "摩纳哥", "斯洛伐克", "斯洛文尼亚", "新加坡", "新西兰", "日本", "智利", "朝鲜", "柬埔寨", "格鲁吉亚",
+                    "比利时", "毛利塔尼亚", "法国", "波兰", "波多黎各", "波黑", "泰国", "澳大利亚", "澳大利亚Australia", "澳门",
+                    "爱尔兰", "爱沙尼亚", "瑞典", "瑞士", "白俄罗斯", "秘鲁", "突尼斯", "立陶宛", "缅甸", "罗马尼亚", "美国",
+                    "老挝", "芬兰", "芬兰Finland", "苏联", "英国", "英国BBC", "荷兰", "菲律宾", "葡萄牙", "蒙古",
+                    "西德", "西班牙", "越南", "阿尔及利亚", "阿尔巴尼亚", "阿根廷", "阿联酋", "韩国",
+                    "香港", "马其顿", "马提尼克", "马来西亚", "马耳他", "黎巴嫩",
+                ]
             } catch (error) {
                 console.error('Error fetching tags:', error);
             }
@@ -161,6 +201,11 @@ export default {
         filterMovies(tag) {
             this.filterTag = [tag];
             // this.fetchMovies(1, this.pageSize);
+        },
+
+        filterMoviesCountry(country){
+            this.filterCountry = [country];
+            this.filterCountry = this.filterCountry.at(0);
         },
 
         async fetchActors() {

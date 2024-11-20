@@ -20,6 +20,7 @@
                 <a-descriptions-item label="年份"> {{ movie.year }} </a-descriptions-item>
                 <a-descriptions-item label="评分"> {{ movie.rating }} </a-descriptions-item>
                 <a-descriptions-item label="类型"> {{ movie.genre }} </a-descriptions-item>
+                <a-descriptions-item lable="国家"> {{ movie.country }}</a-descriptions-item>
                 <a-descriptions-item lable="评分图">  </a-descriptions-item>
               </a-descriptions>
             </a-card>

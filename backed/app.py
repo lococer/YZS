@@ -82,8 +82,9 @@ class Movie(db.Model):
             'ratingsum': self.ratingsum,
             'img': self.img,
             'tags': self.tags,
-           'summary': self.summary,
-            'genre': self.genre
+            'summary': self.summary,
+            'genre': self.genre,
+            'country': self.country,
         }
     
 class Person(db.Model):
@@ -345,7 +346,8 @@ def get_movies():
     actors = request.args.getlist('actors')
     yearRange = request.args.getlist('yearRange')
     ratingRange = request.args.getlist('ratingRange')
-    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}, RatingRange: {ratingRange}")
+    country = request.args.getlist('country')
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}, RatingRange: {ratingRange}, country: {country}")
     # actors 逗号分隔
     actors = [actor.strip() for actor in actors]
 
@@ -355,7 +357,6 @@ def get_movies():
     query = Movie.query
 
     if actors:
-
         # 先将actors从name转换成id
         actors = [Person.query.filter_by(name=actor).first().id for actor in actors]
 
@@ -387,6 +388,12 @@ def get_movies():
             # 添加到查询中
             filter_conditions = [func.array_to_string(Movie.tags, ',').ilike(f"%{tag}%") for tag in tag_ids]
             query = query.filter(or_(*filter_conditions))
+        
+    if country and country is not ['']:
+        countries = country[0].split(',')
+        logger.debug(f"countries: {countries}")
+        query = query.filter(Movie.country.ilike(f"%{countries[0]}%"))
+
     
     # 年代筛选
     if len(yearRange) == 1:
