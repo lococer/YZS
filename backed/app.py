@@ -6,7 +6,7 @@ import base64
 from flask_sqlalchemy import SQLAlchemy
 import logging
 from jinja2 import Template
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, func
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, func, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import re
@@ -343,24 +343,20 @@ def get_movies():
     pageSize = request.args.get('pageSize', 10, type=int)
     tags = request.args.getlist('tags')
     actors = request.args.getlist('actors')
-    logger.debug(f"actors: {actors}")
+    yearRange = request.args.getlist('yearRange')
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}")
     # actors 逗号分隔
     actors = [actor.strip() for actor in actors]
 
     # 计算开始和结束的索引
     offset = (page - 1) * pageSize
     limit = pageSize
-    logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}, Tags: {tags}")
-    logger.debug(f"Actors: {actors}")
-
     query = Movie.query
 
     if actors:
 
         # 先将actors从name转换成id
         actors = [Person.query.filter_by(name=actor).first().id for actor in actors]
-
-        logger.debug(f"Actors ID: {actors}")
 
         # 获取所有演员的电影 ID 的交集
         actor_movies_subqueries = [
@@ -387,7 +383,15 @@ def get_movies():
 
         # 添加过滤条件：筛选 tags 字段包含 tag_ids 列表中的任一元素的记录
         if len(tag_ids) > 0:
-            query = query.filter(Movie.tags.op("&&")(array(tag_ids)))
+            # 添加到查询中
+            filter_conditions = [func.array_to_string(Movie.tags, ',').ilike(f"%{tag}%") for tag in tag_ids]
+            query = query.filter(or_(*filter_conditions))
+    
+    # 年代筛选
+    if len(yearRange) == 1:
+        startYear, endYear = yearRange[0].split(',')
+        logger.debug(f"Start year: {startYear}, End year: {endYear}")
+        query = query.filter(Movie.year.between(startYear, endYear))
 
     # 执行查询
     all_movies = query.offset(offset).limit(limit).all()

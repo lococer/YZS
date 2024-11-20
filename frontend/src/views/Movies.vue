@@ -2,15 +2,21 @@
     <div>
         <h2>标签筛选</h2>
         <a-row gutter="16">
-            <!-- 标签筛选部分 -->
             <a-col :span="24">
-                <a-button-group>
-                    <a-button v-for="tag in movieTags" :key="tag" @click="filterMovies(tag)">
+                <!-- 使用 Select 组件 -->
+                <a-select mode="multiple" allow-clear placeholder="请选择标签" style="width: 100%" @change="filterMovies">
+                    <a-select-option v-for="tag in movieTags" :key="tag" :value="tag">
                         {{ tag }}
-                    </a-button>
-                </a-button-group>
+                    </a-select-option>
+                </a-select>
             </a-col>
         </a-row>
+        <div>
+            <h2>年份筛选</h2>
+            <!-- 滑动输入条 -->
+            <a-slider v-model:value="yearRange" :min="minYear" :max="maxYear" :range="true"
+                onUpdate:value="handleYearChange" />
+        </div>
     </div>
     <div v-if="selectedActors.length > 0">
         <h2>演员筛选</h2>
@@ -21,7 +27,9 @@
         </a-select>
     </div>
     <div>
-        <!-- BUG: 筛选后换页会导致筛选失效，应该保存筛选条件 -->
+        <a-button type="primary" @click="fetchMovies(1, pageSize)">筛选</a-button>
+    </div>
+    <div v-if = "movies.length > 0">
         <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
             :page-size="pageSize" @change="onPaginationChange">
             <template slot="buildOptionText" slot-scope="props">
@@ -41,6 +49,9 @@
                 </a-col>
             </a-row>
         </div>
+    </div>
+    <div v-else>
+        <a-empty/>
     </div>
 
 </template>
@@ -62,12 +73,16 @@ export default {
             filterTag: [], // 当前筛选的标签
             selectedActors: [], // 用户选择的演员
             actors: [], // 所有演员列表
+            minYear: 1900, // 最小年份
+            maxYear: 2021, // 最大年份
+            yearRange: [1900, 2021], // 选择的年份范围
         };
     },
     methods: {
         async fetchMovies(page, pageSize) {
             const tags = this.filterTag;
             const actors = this.selectedActors;
+            const yearRange = this.yearRange;
             console.log("before this.selectedActors",this.selectedActors);
             try {
                 console.log("Fetching movies with page:", page, "pageSize:", pageSize, "tags:", tags, "actors:", actors);
@@ -78,6 +93,7 @@ export default {
                         pageSize: pageSize,
                         actors: actors,
                         tags: tags.join(','),
+                        yearRange: yearRange.join(','),
                     },
                     paramsSerializer: (params) => {
                         // 自定义序列化逻辑，将 actors 数组转换为 `actors=actor1&actors=actor2`
@@ -123,6 +139,12 @@ export default {
                 // const response = await axios.get('http://127.0.0.1:5001/api/tags');
                 // tags.value = response.data;  // 假设后端返回所有电影标签
                 this.movieTags = ['动作', '喜剧', '爱情', '科幻', '动画', '悬疑', '惊悚', '恐怖', '犯罪', '同性'];
+                this.movieTags = [
+                    '喜剧', '剧情', '儿童', '青春', '家庭', '爱情', '科幻', '魔幻','奇幻', '灾难',
+                    '恐怖', '惊悚', '悬疑', '犯罪', '黑帮', '冒险',
+                    '功夫', '武侠', '人物', '传记', '纪录',
+                    '动画', '短片',
+                ]
             } catch (error) {
                 console.error('Error fetching tags:', error);
             }
@@ -130,7 +152,7 @@ export default {
 
         filterMovies(tag) {
             this.filterTag = [tag];
-            this.fetchMovies(1, this.pageSize);
+            // this.fetchMovies(1, this.pageSize);
         },
 
         async fetchActors() {
@@ -153,6 +175,10 @@ export default {
             } catch (error) {
                 console.error('Error fetching actor name:', error);
             }
+        },
+        handleYearChange(yearRange) {
+            console.log('Year range:', yearRange);
+            // this.fetchMovies(1, this.pageSize);
         },
     },
     mounted() {
