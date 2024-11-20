@@ -5,6 +5,7 @@
 </template>
 <script>
 import * as echarts from "echarts";
+import { useRouter } from 'vue-router'; // 引入 vue-router
 
 export default {
   props: {
@@ -15,6 +16,12 @@ export default {
   },
   mounted() {
     this.initChart();
+  },
+  setup(){
+    const router = useRouter();
+    return {
+      router
+    }
   },
   methods: {
     initChart() {
@@ -50,6 +57,26 @@ export default {
           },
         ],
       };
+
+      const navigateToMovies = (params) => {
+        console.log(params.name[0]);
+        const query = {
+          rating: parseInt(params.name[0]),
+        };
+
+        console.log(query);
+        this.$router.push({
+          name: "Movies",
+          query,
+        });
+      };
+
+      // 绑定点击事件
+      myChart.on("click", (params) => {
+        if( params.componentType === "series" && params.seriesType === "pie" ) {
+          navigateToMovies(params.data);
+        }
+      });
 
       // 绘制图表
       myChart.setOption(option);

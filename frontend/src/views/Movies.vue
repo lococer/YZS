@@ -16,6 +16,9 @@
             <!-- 滑动输入条 -->
             <a-slider v-model:value="yearRange" :min="minYear" :max="maxYear" :range="true"
                 onUpdate:value="handleYearChange" />
+            <h2>评分筛选</h2>
+            <a-slider v-model:value="ratingRange" :min="minRating" :max="maxRating" :range="true"
+                onUpdate:value="handleRatingChange" />
         </div>
     </div>
     <div v-if="selectedActors.length > 0">
@@ -76,6 +79,9 @@ export default {
             minYear: 1900, // 最小年份
             maxYear: 2021, // 最大年份
             yearRange: [1900, 2021], // 选择的年份范围
+            minRating: 0, // 最小评分
+            maxRating: 10, // 最大评分
+            ratingRange: [0, 10], // 选择的评分范围
         };
     },
     methods: {
@@ -83,6 +89,7 @@ export default {
             const tags = this.filterTag;
             const actors = this.selectedActors;
             const yearRange = this.yearRange;
+            const ratingRange = this.ratingRange;
             console.log("before this.selectedActors",this.selectedActors);
             try {
                 console.log("Fetching movies with page:", page, "pageSize:", pageSize, "tags:", tags, "actors:", actors);
@@ -94,6 +101,7 @@ export default {
                         actors: actors,
                         tags: tags.join(','),
                         yearRange: yearRange.join(','),
+                        ratingRange: ratingRange.join(','),
                     },
                     paramsSerializer: (params) => {
                         // 自定义序列化逻辑，将 actors 数组转换为 `actors=actor1&actors=actor2`
@@ -180,6 +188,10 @@ export default {
             console.log('Year range:', yearRange);
             // this.fetchMovies(1, this.pageSize);
         },
+        handleRatingChange(ratingRange) {
+            console.log('Rating range:', ratingRange);
+            // this.fetchMovies(1, this.pageSize);
+        },
     },
     mounted() {
     },
@@ -191,6 +203,10 @@ export default {
             console.log('Query actors:', this.$route.query.actor1, this.$route.query.actor2);
             this.selectedActors = [await this.turnActorIdToName(this.$route.query.actor1), await this.turnActorIdToName(this.$route.query.actor2)];
             console.log('Selected actors:', this.selectedActors);
+        }
+        if (this.$route.query.rating){
+            console.log('Query rating:', this.$route.query.rating);
+            this.ratingRange = [this.$route.query.rating, this.$route.query.rating];
         }
         this.fetchMovies(this.current, this.pageSize);
     },

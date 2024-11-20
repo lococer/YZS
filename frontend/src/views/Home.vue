@@ -1,7 +1,6 @@
 <template>
   <div>
     <!-- TODO 添加图 -->
-    <!-- TODO 添加跳转 -->
     <h1>欢迎来到影智算</h1>
     <p>Use this app to predict movie ratings and explore movies.</p>
   </div>

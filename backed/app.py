@@ -344,7 +344,8 @@ def get_movies():
     tags = request.args.getlist('tags')
     actors = request.args.getlist('actors')
     yearRange = request.args.getlist('yearRange')
-    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}")
+    ratingRange = request.args.getlist('ratingRange')
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}, RatingRange: {ratingRange}")
     # actors 逗号分隔
     actors = [actor.strip() for actor in actors]
 
@@ -392,6 +393,12 @@ def get_movies():
         startYear, endYear = yearRange[0].split(',')
         logger.debug(f"Start year: {startYear}, End year: {endYear}")
         query = query.filter(Movie.year.between(startYear, endYear))
+
+    # 评分筛选
+    if len(ratingRange) == 1:
+        startRating, endRating = ratingRange[0].split(',')
+        logger.debug(f"Start rating: {startRating}, End rating: {endRating}")
+        query = query.filter(Movie.rating.between(startRating, endRating))
 
     # 执行查询
     all_movies = query.offset(offset).limit(limit).all()
