@@ -16,7 +16,7 @@
               <p>类型: {{ movie.genre }}</p> -->
               <a-descriptions >
                 <a-descriptions-item label="电影名"> {{ movie.name }} </a-descriptions-item>
-                <a-descriptions-item label="导演">  </a-descriptions-item>
+                <a-descriptions-item label="导演">  {{ movie.directorName }} </a-descriptions-item>
                 <a-descriptions-item label="年份"> {{ movie.year }} </a-descriptions-item>
                 <a-descriptions-item label="评分"> {{ movie.rating }} </a-descriptions-item>
                 <a-descriptions-item label="类型"> {{ movie.genre }} </a-descriptions-item>

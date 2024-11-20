@@ -103,4 +103,16 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+html, body {
+  width: 1200px; /* 你可以根据需要调整这个宽度 */
+  margin: 0 auto; /* 居中显示 */
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  max-width: 1200px; /* 与 html 和 body 的宽度保持一致 */
+  margin: 0 auto; /* 居中显示 */
+}
+</style>

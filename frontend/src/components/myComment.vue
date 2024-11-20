@@ -2,31 +2,38 @@
   <div>
     <!-- <div>{{ movieId }}</div> -->
     <div class="comment-component">
+      <h4>发表评论</h4>
+      <!-- {{ currentUsername }} -->
+      <a-form @submit.prevent="submitComment">
+        <a-textarea v-model:value="newComment.content" placeholder="写下你的评论..." />
+        <a-button type="primary" html-type="submit">提交</a-button>
+      </a-form>
+
+
       <h3>评论列表</h3>
+
+      <div v-if="userComments && userComments.length > 0">
+        <h4>我的评论</h4>
+        <a-list>
+          <a-list-item v-for="(comment, index) in userComments">
+            <a-comment :key="index" :author="comment.username" :avatar="comment.avatar">
+              <template #content>
+                <p>{{ comment.comment }}</p>
+              </template>
+            </a-comment>
+          </a-list-item>
+        </a-list>
+      </div>
+      <a-divider>其他用户评论</a-divider>
       <a-list>
-        <a-list-item>
-          <a-comment
-            v-for="(comment, index) in comments"
-            :key="index"
-            :author="comment.username"
-            :avatar="comment.avatar"
-          >
+        <a-list-item v-for="(comment, index) in comments">
+          <a-comment v-if="comment.username!== currentUsername" :key="index" :author="comment.username" :avatar="comment.avatar">
             <template #content>
               <p>{{ comment.comment }}</p>
             </template>
           </a-comment>
         </a-list-item>
       </a-list>
-
-      <h4>发表评论</h4>
-      <!-- {{ currentUsername }} -->
-      <a-form @submit.prevent="submitComment">
-        <a-textarea
-          v-model:value="newComment.content"
-          placeholder="写下你的评论..."
-        />
-        <a-button type="primary" html-type="submit">提交</a-button>
-      </a-form>
     </div>
   </div>
 </template>
@@ -50,6 +57,7 @@ export default {
                 content: ''
             },
             // movieId: 123,
+            userComments: [],
         };
     },
     components: {
@@ -86,13 +94,34 @@ export default {
                 alert('评论失败');
                 console.log(e);
             }
+            this.fetchUserComments(this.currentUsername);
         },
         fetchComments() {
             // 调用接口获取评论列表
             console.log(this.movieId);
-            axios.get(`http://127.0.0.1:5001/api/movies/comments/${this.movieId}`)
+            axios.get(`http://127.0.0.1:5001/api/movies/comments`, {
+                params:{
+                    movieid: this.movieId,
+                }
+            })
                .then(response => {
                     this.comments = response.data;
+                })
+               .catch(error => {
+                    console.log(error);
+                });
+        },
+        fetchUserComments(username) {
+            // 调用接口获取用户评论列表
+            console.log(username);
+            axios.get(`http://127.0.0.1:5001/api/movies/comments`,{
+              params:{
+                username: username,
+                movieid: this.movieId,
+              }
+            })
+               .then(response => {
+                    this.userComments = response.data;
                 })
                .catch(error => {
                     console.log(error);
@@ -117,8 +146,16 @@ export default {
                     this.fetchComments();
                 }
             }
+        },
+        currentUsername:{
+            immeditate: true,
+            handler(newval){
+                if(newval){
+                    this.fetchUserComments(newval);
+                }
+            }
         }
-    }
+    },
 };
 </script>
 

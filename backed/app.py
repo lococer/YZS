@@ -414,7 +414,12 @@ def movieinfo(movie_id):
     
     movie.img = encode_image_url(movie.img)
 
-    return jsonify(movie.serialize())
+    #增加电影导演
+    directorName = get_people_by_movie_id(movie_id, role="director")[0].name if get_people_by_movie_id(movie_id, role="director") else None
+
+    result = movie.serialize()
+    result.update({'directorName':directorName})
+    return jsonify(result)
 
     people = get_people_by_movie_id(movie_id)
 
@@ -450,20 +455,30 @@ def get_movie_actors(movie_id):
 
     return jsonify([actor.serialize() for actor in actors])
 
-@app.route('/api/movies/comments/<int:movie_id>')
-def get_movie_comments(movie_id):
-    logger.debug(f"Movie ID!: {movie_id}")
+@app.route('/api/movies/comments', methods=['GET'])
+def get_movie_comments():
+    movie_id = request.args.get('movieid')
+    username = request.args.get('username')
+
     if not movie_id:
         return jsonify({'error': 'Movie ID is required.'}), 400
-
-    # 获取电影的所有评论
-    comments = (
-        db.session.query(Comment)
-        .filter(Comment.movieid == movie_id)
-        .limit(10)
-        .all()
-    )
     
+    if username:
+        comments = (
+            db.session.query(Comment)
+            .filter(Comment.movieid == movie_id)
+            .filter(Comment.username == username)
+            .limit(10)
+            .all()
+        )
+    else:
+        comments = (
+            db.session.query(Comment)
+            .filter(Comment.movieid == movie_id)
+            .limit(10)
+            .all()
+        )
+
     result = jsonify([comment.serialize() for comment in comments])
     logger.debug(result)
     return result
