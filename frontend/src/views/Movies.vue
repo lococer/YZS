@@ -1,60 +1,66 @@
 <template>
     <div>
         <div>
-            <h2>电影搜索</h2>
-            
-            <h2>标签筛选</h2>
-            <a-row gutter="16">
-                <a-col :span="12">
-                    <!-- 使用 Select 组件 -->
-                    <a-select mode="multiple" allow-clear placeholder="选择标签" style="width: 100%"
-                        @change="filterMovies">
-                        <a-select-option v-for="tag in movieTags" :key="tag" :value="tag">
-                            {{ tag }}
-                        </a-select-option>
-                    </a-select>
-                </a-col>
-            </a-row>
-            <h2>国家筛选</h2>
-            <a-row gutter="16">
-                <a-col :span="12">
-                    <a-select mode="tags" allow-clear placeholder="选择国家" style="width: 100%" v-model:value="filterCountry"
-                    @change="filterMoviesCountry">
-                    <a-select-option v-for="country in movieCountry" :key="country" :value="country">
-                        {{ country }}
-                    </a-select-option>
-                    </a-select>
-                </a-col>
-            </a-row>
+            <div>
+                <h2>电影名</h2>
+                <a-row gutter="16">
+                    <a-col :span="12">
+                        <a-input v-model:value="searchText" placeholder="搜索电影" />
+                    </a-col>
+                </a-row>
+                <h2>标签筛选</h2>
+                <a-row gutter="16">
+                    <a-col :span="12">
+                        <!-- 使用 Select 组件 -->
+                        <a-select mode="multiple" allow-clear placeholder="选择标签" style="width: 100%"
+                            @change="filterMovies">
+                            <a-select-option v-for="tag in movieTags" :key="tag" :value="tag">
+                                {{ tag }}
+                            </a-select-option>
+                        </a-select>
+                    </a-col>
+                </a-row>
+                <h2>国家筛选</h2>
+                <a-row gutter="16">
+                    <a-col :span="12">
+                        <a-select mode="tags" allow-clear placeholder="选择国家" style="width: 100%"
+                            v-model:value="filterCountry" @change="filterMoviesCountry">
+                            <a-select-option v-for="country in movieCountry" :key="country" :value="country">
+                                {{ country }}
+                            </a-select-option>
+                        </a-select>
+                    </a-col>
+                </a-row>
+            </div>
+            <div>
+                <h2>年份筛选</h2>
+                <a-row gutter="16">
+                    <a-col :span="12">
+                        <!-- 滑动输入条 -->
+                        <a-slider v-model:value="yearRange" :min="minYear" :max="maxYear" :range="true"
+                            onUpdate:value="handleYearChange" />
+                    </a-col>
+                </a-row>
+                <h2>评分筛选</h2>
+                <a-row gutter="16">
+                    <a-col :span="12">
+                        <a-slider v-model:value="ratingRange" :min="minRating" :max="maxRating" :range="true"
+                            onUpdate:value="handleRatingChange" />
+                    </a-col>
+                </a-row>
+            </div>
+        </div>
+        <div v-if="selectedActors.length > 0">
+            <h2>演员筛选</h2>
+            <a-select mode="multiple" placeholder="选择演员" v-model:value="selectedActors" @change="handleActorChange">
+                <a-select-option v-for="actor in actors" :key="actor.id" :value="actor.id">
+                    {{ actor.name }}
+                </a-select-option>
+            </a-select>
         </div>
         <div>
-            <h2>年份筛选</h2>
-            <a-row gutter="16">
-                <a-col :span="12">
-                    <!-- 滑动输入条 -->
-                    <a-slider v-model:value="yearRange" :min="minYear" :max="maxYear" :range="true"
-                    onUpdate:value="handleYearChange" />
-                </a-col>
-            </a-row>
-            <h2>评分筛选</h2>
-            <a-row gutter="16">
-                <a-col :span="12">
-                    <a-slider v-model:value="ratingRange" :min="minRating" :max="maxRating" :range="true"
-                    onUpdate:value="handleRatingChange" />
-                </a-col>
-            </a-row>
+            <a-button type="primary" @click="fetchMovies(1, pageSize)">筛选</a-button>
         </div>
-    </div>
-    <div v-if="selectedActors.length > 0">
-        <h2>演员筛选</h2>
-        <a-select mode="multiple" placeholder="选择演员" v-model:value="selectedActors" @change="handleActorChange">
-            <a-select-option v-for="actor in actors" :key="actor.id" :value="actor.id">
-                {{ actor.name }}
-            </a-select-option>
-        </a-select>
-    </div>
-    <div>
-        <a-button type="primary" @click="fetchMovies(1, pageSize)">筛选</a-button>
     </div>
     <div v-if="movies.length > 0">
         <a-pagination v-model:value="current" :page-size-options="pageSizeOptions" :total="total" show-size-changer
@@ -109,6 +115,7 @@ export default {
             minRating: 0, // 最小评分
             maxRating: 10, // 最大评分
             ratingRange: [0, 10], // 选择的评分范围
+            searchText: '', // 搜索文本
         };
     },
     methods: {
@@ -118,6 +125,7 @@ export default {
             const yearRange = this.yearRange;
             const ratingRange = this.ratingRange;
             const country = this.filterCountry;
+            const searchText = this.searchText;
             try {
                 console.log("Fetching movies with page:", page, "pageSize:", pageSize, "tags:", tags, "actors:", actors);
                 // const response = await axios.get(`http://127.0.0.1:5001/api/movies?page=${page}&pageSize=${pageSize}&tags=${tags.join(',')}&actors=${actors.join(',')}`);
@@ -130,6 +138,7 @@ export default {
                         yearRange: yearRange.join(','),
                         ratingRange: ratingRange.join(','),
                         country: country.join(','),
+                        searchText: searchText,
                     },
                     paramsSerializer: (params) => {
                         // 自定义序列化逻辑，将 actors 数组转换为 `actors=actor1&actors=actor2`
@@ -176,12 +185,12 @@ export default {
                 // tags.value = response.data;  // 假设后端返回所有电影标签
                 this.movieTags = ['动作', '喜剧', '爱情', '科幻', '动画', '悬疑', '惊悚', '恐怖', '犯罪', '同性'];
                 this.movieTags = [
-                    '喜剧', '剧情', '儿童', '青春', '家庭', '爱情', '科幻', '魔幻','奇幻', '灾难',
+                    '喜剧', '剧情', '儿童', '青春', '家庭', '爱情', '科幻', '魔幻', '奇幻', '灾难',
                     '恐怖', '惊悚', '悬疑', '犯罪', '黑帮', '冒险',
                     '功夫', '武侠', '人物', '传记', '纪录',
                     '动画', '短片',
                 ]
-                this.movieCountry=[
+                this.movieCountry = [
                     "不丹", "东德", "中国", "中国大陆", "丹麦", "乌克兰", "乌拉圭", "乍得", "亚美尼亚",
                     "以色列", "伊朗", "俄罗斯", "保加利亚", "克罗地亚", "八一电影制片厂", "冰岛", "冰島Iceland",
                     "刚果", "利比亚", "加拿大", "加拿大Canada", "加纳", "匈牙利", "南斯拉夫", "南斯拉夫联盟共和国",
@@ -205,7 +214,7 @@ export default {
             // this.fetchMovies(1, this.pageSize);
         },
 
-        filterMoviesCountry(country){
+        filterMoviesCountry(country) {
             this.filterCountry = [country];
             this.filterCountry = this.filterCountry.at(0);
         },
@@ -221,7 +230,7 @@ export default {
         },
 
         async turnActorIdToName(actorId) {
-            try{
+            try {
                 const response = await axios.get(`http://127.0.0.1:5001/api/person/${actorId}`);
                 console.log('Turning actor id to name:', actorId);
                 console.log('Response:', response);
@@ -251,11 +260,11 @@ export default {
             this.selectedActors = [await this.turnActorIdToName(this.$route.query.actor1), await this.turnActorIdToName(this.$route.query.actor2)];
             console.log('Selected actors:', this.selectedActors);
         }
-        if (this.$route.query.rating){
+        if (this.$route.query.rating) {
             console.log('Query rating:', this.$route.query.rating);
             this.ratingRange = [this.$route.query.rating, this.$route.query.rating];
         }
-        if (this.$route.query.country){
+        if (this.$route.query.country) {
             console.log('Query country', this.$route.query.country);
             this.filterCountry = [this.$route.query.country];
         }

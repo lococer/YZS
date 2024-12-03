@@ -3,7 +3,7 @@
     <!-- TODO 添加图 -->
     <h1>欢迎来到影智算</h1>
     <!-- <p>Use this app to predict movie ratings and explore movies.</p> -->
-    <p>在这里，你可以查看电影信息总览</p>
+    <p>在这里，你可以查看电影信息总览以及演员电影信息总览。</p>
   </div>
   <div>
     <h2>电影评分分布</h2>

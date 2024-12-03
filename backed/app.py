@@ -347,7 +347,10 @@ def get_movies():
     yearRange = request.args.getlist('yearRange')
     ratingRange = request.args.getlist('ratingRange')
     country = request.args.getlist('country')
-    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}, RatingRange: {ratingRange}, country: {country}")
+    searchText = request.args.get('searchText')
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, Tags: {tags}, Actors: {actors}, YearRange: {yearRange}, RatingRange: {ratingRange}, country: {country}, searchText: {searchText}")
+
+
     # actors 逗号分隔
     actors = [actor.strip() for actor in actors]
 
@@ -406,6 +409,12 @@ def get_movies():
         startRating, endRating = ratingRange[0].split(',')
         logger.debug(f"Start rating: {startRating}, End rating: {endRating}")
         query = query.filter(Movie.rating.between(startRating, endRating))
+
+    if searchText:
+        # 处理搜索文本
+        search_text = searchText.strip()
+        logger.debug(f"Search text: {search_text}")
+        query = query.filter(Movie.name.ilike(f"%{search_text}%"))
 
     # 执行查询
     all_movies = query.offset(offset).limit(limit).all()
@@ -525,19 +534,54 @@ def add_movie_comment():
 
 @app.route('/api/persons', methods=['GET'])
 def get_persons():
+    logger.debug("Get persons")
     page = request.args.get('page', 1, type=int)
     pageSize = request.args.get('pageSize', 10, type=int)
-    # 计算开始和结束的索引
-    offset = (page - 1) * pageSize
-    limit = offset + pageSize
-    logger.debug(f"Page: {page}, PageSize: {pageSize}, Offset: {offset}, Limit: {limit}")
-    # 从数据库获取分页后的人员数据
-    all_persons = Person.query.offset(offset).limit(pageSize).all()
-    all_persons = all_persons[0:200]
-    for person in all_persons:
+    searchText = request.args.get('searchText')
+    birthYearRange = request.args.getlist('birthYearRange')
+    genderMale = request.args.get('genderMale', type=lambda x: x.lower() in ('true', '1', 't'))
+    genderFemale = request.args.get('genderFemale', type=lambda x: x.lower() in ('true', '1', 't'))
+
+    logger.debug(f"Page: {page}, PageSize: {pageSize}, SearchText: {searchText}, BirthYearRange: {birthYearRange}, GenderMale: {genderMale}, GenderFemale: {genderFemale}")
+    # 构造查询
+    query = Person.query
+
+    # 过滤搜索文本
+    if searchText:
+        query = query.filter(Person.name.ilike(f"%{searchText}%"))
+
+    # 过滤出生年份范围
+    if len(birthYearRange) == 1:
+        start_year, end_year = birthYearRange[0].split(',')
+        query = query.filter(
+            Person.birthday.between(f"{start_year}-01-01", f"{end_year}-12-31")
+        )
+
+    # 过滤性别
+    if genderMale and genderFemale:
+        logger.debug("Both male and female selected.")
+        query = query.filter(Person.sex.in_(["男", "女"]))
+    elif genderMale:
+        logger.debug("Only male selected.")
+        query = query.filter(Person.sex == "男")
+    elif genderFemale:
+        logger.debug("Only female selected.")
+        query = query.filter(Person.sex == "女")
+
+    logger.debug(f"genderMale: {genderMale}, genderFemale: {genderFemale}")
+    logger.debug(f"Query: {query}")
+
+    # 分页
+    total = query.count()
+    persons = query.offset((page - 1) * pageSize).limit(pageSize).all()
+    
+    for person in persons:
         person.img = encode_image_url(person.img)
-    # logger.debug(all_persons)
-    return jsonify([person.serialize() for person in all_persons])
+
+    # 序列化返回
+    result = {"persons": [person.serialize() for person in persons], "total": total}
+
+    return jsonify(result)
 
 @app.route('/api/allPersons', methods=['GET'])
 def get_all_persons():
