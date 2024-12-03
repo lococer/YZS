@@ -618,6 +618,16 @@ def get_movies_ratings():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/MoviesCountries', methods=['GET'])
+def get_movies_countries():
+    # 查询每个国家电影数量
+    countries = Movie.query.with_entities(Movie.country, db.func.count('*').label('total')).group_by(Movie.country).all()
+
+    # 将查询结果转换为字典列表
+    countries_data = [{'country': country[0], 'total': country[1]} for country in countries]
+
+    return jsonify(countries_data)
+
 @app.route('/movies/search')
 def search_movies():
     queries = request.args.getlist('q[]')

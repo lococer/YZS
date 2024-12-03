@@ -1,6 +1,8 @@
 <template>
     <div>
         <div>
+            <h2>电影搜索</h2>
+            
             <h2>标签筛选</h2>
             <a-row gutter="16">
                 <a-col :span="12">
@@ -252,6 +254,10 @@ export default {
         if (this.$route.query.rating){
             console.log('Query rating:', this.$route.query.rating);
             this.ratingRange = [this.$route.query.rating, this.$route.query.rating];
+        }
+        if (this.$route.query.country){
+            console.log('Query country', this.$route.query.country);
+            this.filterCountry = [this.$route.query.country];
         }
         this.fetchMovies(this.current, this.pageSize);
     },
