@@ -645,45 +645,11 @@ def personinfo(person_id):
 @app.route('/api/movies/genres', methods=['GET'])
 def get_movie_genres():
     # 获取所有电影类型
-    genre = [
-"爱情",
-"古装",
-"戏曲",
-"剧情",
-"歌舞",
-"情色",
-"同性",
-"黑色电影",
-"科幻",
-"冒险",
-"运动",
-"喜剧",
-"家庭",
-"奇幻",
-"动作",
-"动画",
-"悬疑",
-"传记",
-"战争",
-"惊悚",
-"犯罪",
-"灾难",
-"历史",
-"西部",
-"儿童",
-"恐怖",
-"音乐",
-"鬼怪",
-"武侠",
-"Adult",
-"真人秀",
-"舞台艺术",
-"脱口秀",
-"惊栗",
-"纪录片",
-"荒诞",
-"Talk-Show",
-]
+    genre = [ "爱情", "古装", "戏曲", "剧情", "歌舞", "情色", "同性", "黑色电影", "科幻",
+    "冒险", "运动", "喜剧", "家庭", "奇幻", "动作", "动画", "悬疑", "传记", "战争", "惊悚",
+    "犯罪", "灾难", "历史", "西部", "儿童", "恐怖", "音乐", "鬼怪", "武侠",
+    "Adult", "真人秀", "舞台艺术", "脱口秀", "惊栗", "纪录片", "荒诞", "Talk-Show",
+    ]
     return jsonify(genre)
 
 @app.route('/api/MoviesRatings', methods=['GET'])
@@ -719,6 +685,27 @@ def get_movies_countries():
     countries_data = [{'country': country[0], 'total': country[1]} for country in countries]
 
     return jsonify(countries_data)
+
+@app.route('/api/MoviesGenres')
+def get_movies_genres():
+    # 获取所有电影类型
+    try:
+        # 查询每个 genre 的电影数量
+        genre_counts = (
+            db.session.query(Movie.genre, func.count(Movie.id))
+            .group_by(Movie.genre)
+            .all()
+        )
+        
+        # 处理结果为字典格式，并过滤掉空值
+        genre_count_dict = {
+            genre if genre else 'Unknown': count
+            for genre, count in genre_counts
+        }
+        return jsonify([{'tag': genre, 'value': count} for genre, count in genre_count_dict.items()]), 200
+        return jsonify({'genre_counts': genre_count_dict}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/movies/search')
 def search_movies():
