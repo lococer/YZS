@@ -48,6 +48,16 @@
         @change="handleActor2Change"
       ></a-select>
     </a-form-item>
+    <a-form-item label="类型">
+      <a-select
+        mode="tags"
+        style="width: 100%"
+        placeholder="选择类型"
+        :options="genre"
+        v-model:value="selectedGenre"
+        @change="handleChange"
+      ></a-select>
+    </a-form-item>
     <a-button type="primary" @click="predictRating">推测评分</a-button>
   </a-form>
   <div v-if="predictedRating">
@@ -76,6 +86,8 @@ export default {
     const selectedActor1 = ref([]);
     const selectedActor2 = ref([]);
     const predictedRating = ref(null);
+    const genre = ref([]);
+    const selectedGenre = ref([]);
 
     // const options = [...Array(25)].map((_, i) => ({
     //   value: (i + 10).toString(36) + (i + 1), label: `Option ${i + 1}`,
@@ -144,8 +156,9 @@ export default {
       const screenwriterName = selectedScreenwriter.value;
       const actor1Name = selectedActor1.value;
       const actor2Name = selectedActor2.value;
+      const genreName = selectedGenre.value;
 
-      console.log('Predicting rating for:', directorName, screenwriterName, actor1Name, actor2Name);
+      console.log('Predicting rating for:', directorName, screenwriterName, actor1Name, actor2Name, genreName);
 
       // 调用后端API获取评分，这里假设API为 http://127.0.0.1:5001/api/predict-rating
       // 并假设它接受导演、编剧和两个主演的id作为参数
@@ -156,6 +169,7 @@ export default {
             autor: selectedScreenwriter.value,
             actor1: selectedActor1.value,
             actor2: selectedActor2.value,
+            genre: selectedGenre.value,
           }
         });
         predictedRating.value = response.data; // 假设返回的评分在response.data中
@@ -174,6 +188,11 @@ export default {
 
       const actorRes = await axios.get('http://127.0.0.1:5001/api/persons/actors');
       actors.value = actorRes.data.map(item => ({ value: item.name, label: item.name }));
+
+      const genreRes = await axios.get('http://127.0.0.1:5001/api/movies/genres');
+      genre.value = genreRes.data.map(item => ({ value: item, label: item }));
+      
+      // genre.value = [ {value:'动作', label:'动作'}, {value:'喜剧', label:'喜剧'} ];
     };
 
     onMounted(fetchOptions);
@@ -194,6 +213,8 @@ export default {
       handleActor1Change,
       handleActor2Change,
       options,
+      genre,
+      selectedGenre,
     };
   },
 };

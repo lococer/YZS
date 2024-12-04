@@ -247,6 +247,10 @@ def predict_rating():
     autorName = request.args.getlist('autor[]')
     actor1Name = request.args.getlist('actor1[]')
     actor2Name = request.args.getlist('actor2[]')
+    genre = request.args.getlist('genre[]')
+
+    logger.debug("!!!!!!!!!!!!!!!!!!")
+    logger.debug(f"directorName: {directorName}, autorName: {autorName}, actor1Name: {actor1Name}, actor2Name: {actor2Name}, genre: {genre}")
 
     directorName = directorName[0]
     autorName = autorName[0]
@@ -637,6 +641,50 @@ def personinfo(person_id):
     person.img = encode_image_url(person.img)
 
     return jsonify(person.serialize())
+
+@app.route('/api/movies/genres', methods=['GET'])
+def get_movie_genres():
+    # 获取所有电影类型
+    genre = [
+"爱情",
+"古装",
+"戏曲",
+"剧情",
+"歌舞",
+"情色",
+"同性",
+"黑色电影",
+"科幻",
+"冒险",
+"运动",
+"喜剧",
+"家庭",
+"奇幻",
+"动作",
+"动画",
+"悬疑",
+"传记",
+"战争",
+"惊悚",
+"犯罪",
+"灾难",
+"历史",
+"西部",
+"儿童",
+"恐怖",
+"音乐",
+"鬼怪",
+"武侠",
+"Adult",
+"真人秀",
+"舞台艺术",
+"脱口秀",
+"惊栗",
+"纪录片",
+"荒诞",
+"Talk-Show",
+]
+    return jsonify(genre)
 
 @app.route('/api/MoviesRatings', methods=['GET'])
 def get_movies_ratings():
